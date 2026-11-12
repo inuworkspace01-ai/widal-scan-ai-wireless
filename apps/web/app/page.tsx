@@ -94,7 +94,7 @@ export default function Home() {
       if (!active) return;
       if (error) setAuthError("Sesi tidak dapat dibaca. Silakan login kembali.");
       if (data.session?.user) {
-        const { data: row, error: profileError } = await supabase
+        const { data: row, error: profileError } = await client
           .from("profiles")
           .select("username,display_name,role,is_active")
           .eq("user_id", data.session.user.id)
