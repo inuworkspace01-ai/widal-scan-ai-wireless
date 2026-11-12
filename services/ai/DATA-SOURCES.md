@@ -20,6 +20,18 @@ No public Kaggle clinical dataset can substitute for these real, method-specific
 
 The optional `train_clinical_baseline.py` script is a research-only baseline runner. It requires the user to inspect the CSV, explicitly choose the target column, and exclude identifiers/leakage features. It does not return a patient diagnosis or treatment recommendation.
 
+## 3. Related agglutination image dataset (not Widal)
+
+- **BloodyWell:** https://zenodo.org/records/14285035
+- **Repository and public test subset:** https://github.com/createcolor/bloody_well
+- The Zenodo record describes 3,139 anonymised 512×512 well images from 92 plates and 550 blood samples mixed with 13 reagents for ABO, Rh and Kell blood-group systems. The dataset includes medical-record-derived blood group ground truth and six-expert certainty assessments for agglutination.
+- The public GitHub README says the full dataset is not available from the repository and exposes a 529-image test subset (228 MB) with binary `gt_result` (0/1), reagent type, plate row and reagent column.
+- **Use in this project:** external morphology/quality-control research only, or a separate binary agglutination benchmark. Do not convert its labels into Widal grades 0, 1+, 2+, 3+, 4+ and do not merge it with Widal training/validation/test partitions. It uses different biological targets and reagent chemistry.
+- **Rights/access:** verify the Zenodo record's current licence and any dataset-specific terms before download, redistribution or model training. The GitHub repository's software licence should not automatically be assumed to license every linked image file.
+- **Status:** candidate source recorded; not downloaded or trained in this project.
+
+A separate one-image illustration is available on Wikimedia Commons: https://commons.wikimedia.org/wiki/File:Widal_Test_Slide.jpg. It is licensed CC BY-SA 3.0 and shows a Widal slide with O/H agglutination. This is a single illustrative image without machine-readable per-well grade annotations; use it for reference/demo only, not model training.
+
 ## 3. WHO reference material
 
 - **WHO laboratory manual for typhoid and paratyphoid (enteric fever), 2026:** https://www.who.int/publications/b/65402
