@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import {
   Activity, ArrowLeft, CheckCircle2, CircleAlert, KeyRound,
-  LoaderCircle, LockKeyhole, RefreshCw, ShieldCheck,
+  ExternalLink, LoaderCircle, LockKeyhole, RefreshCw, ShieldCheck,
 } from "lucide-react";
 
 type SetupStatus = {
@@ -213,7 +213,7 @@ export default function SetupPage() {
                   <li>Kembali ke halaman ini dan tekan <strong>Periksa ulang</strong>.</li>
                 </ol>
                 <a href="https://vercel.com/inuworkspace01-3852/widal-scan-ai-wireless/settings/environment-variables" target="_blank" rel="noreferrer">
-                  Buka Environment Variables Vercel <ArrowLeft size={13}/>
+                  Buka Environment Variables Vercel <ExternalLink size={13}/>
                 </a>
                 <p><strong>Catatan:</strong> menghubungkan Supabase sebagai integrasi tidak selalu memasukkan key ke Environment Variables project Vercel. Pastikan empat variable ini benar-benar ditambahkan pada project yang menjalankan website.</p>
               </div>
