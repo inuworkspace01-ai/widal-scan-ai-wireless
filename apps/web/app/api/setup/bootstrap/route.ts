@@ -36,11 +36,11 @@ function json(message: string, status: number, extra: Record<string, unknown> = 
 }
 
 async function findAuthUser(
-  admin: ReturnType<typeof createClient>["auth"]["admin"],
+  supabase: ReturnType<typeof createClient>,
   email: string
 ): Promise<User | null> {
   for (let page = 1; page <= 10; page += 1) {
-    const { data, error } = await admin.listUsers({ page, perPage: 1000 });
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 1000 });
     if (error) throw error;
 
     const found = data.users.find(
@@ -67,7 +67,8 @@ export async function POST(request: NextRequest) {
   }
 
   const expectedToken = process.env.BOOTSTRAP_SETUP_TOKEN;
-  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseUrl =
+    process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!expectedToken || expectedToken.length < 32 || !supabaseUrl || !serviceRoleKey) {
@@ -125,10 +126,28 @@ export async function POST(request: NextRequest) {
   const completed: string[] = [];
 
   try {
+    const { data: existingProfiles, error: profileLookupError } = await supabase
+      .from("profiles")
+      .select("username")
+      .in("username", ACCOUNT_DEFINITIONS.map((account) => account.username));
+
+    if (profileLookupError) throw profileLookupError;
+
+    const existingIds = new Set(
+      (existingProfiles || []).map((profile) => profile.username)
+    );
+    if (ACCOUNT_DEFINITIONS.every((account) => existingIds.has(account.username))) {
+      return json(
+        "Setup awal sudah pernah diselesaikan. Hapus BOOTSTRAP_SETUP_TOKEN dari Vercel; gunakan menu reset password resmi bila diperlukan.",
+        409,
+        { setupComplete: true }
+      );
+    }
+
     for (let index = 0; index < ACCOUNT_DEFINITIONS.length; index += 1) {
       const account = ACCOUNT_DEFINITIONS[index];
       const email = account.username + "@login.widal-scan.invalid";
-      let user = await findAuthUser(supabase.auth.admin, email);
+      let user = await findAuthUser(supabase, email);
 
       if (!user) {
         const { data, error } = await supabase.auth.admin.createUser({
@@ -141,7 +160,7 @@ export async function POST(request: NextRequest) {
         if (error) {
           // Handle a simultaneous first-time setup attempt without changing
           // an existing account password.
-          user = await findAuthUser(supabase.auth.admin, email);
+          user = await findAuthUser(supabase, email);
           if (!user) throw error;
         } else {
           user = data.user;
