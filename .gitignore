@@ -6,3 +6,8 @@ node_modules
 __pycache__
 runtime/captures
 .DS_Store
+.env.accounts
+services/ai/data/raw/
+services/ai/data/crops/
+services/ai/artifacts/
+services/ai/clinical-artifacts/
