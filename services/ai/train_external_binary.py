@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import random
 from pathlib import Path
@@ -27,6 +28,15 @@ LABEL_TO_INDEX = {label: index for index, label in enumerate(LABELS)}
 IMAGE_SIZE = 224
 MEAN = [0.485, 0.456, 0.406]
 STD = [0.229, 0.224, 0.225]
+TASK = "external_agglutination_binary"
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def seed_everything(seed: int) -> None:
@@ -56,36 +66,72 @@ class BinaryAgglutinationDataset(Dataset):
         return self.transform(image), LABEL_TO_INDEX[str(row["label"])]
 
 
-def read_manifest(path: Path, image_root: Path):
-    frame = pd.read_csv(path, dtype={"label": str, "split": str, "image_path": str})
-    required = {"image_path", "split", "label"}
+def read_manifest(path: Path, image_root: Path) -> tuple[pd.DataFrame, dict]:
+    frame = pd.read_csv(
+        path,
+        dtype={
+            "image_path": str,
+            "split": str,
+            "label": str,
+            "sha256": str,
+            "potential_group_token": str,
+            "task": str,
+        },
+    )
+    required = {"image_path", "split", "label", "sha256", "task"}
     missing = required - set(frame.columns)
     if missing:
-        raise ValueError(f"Manifest missing columns: {sorted(missing)}")
+        raise ValueError(f"Manifest missing required columns: {sorted(missing)}")
 
     frame = frame.dropna(subset=list(required)).copy()
     frame["split"] = frame["split"].str.strip().str.lower()
     frame["label"] = frame["label"].str.strip().str.lower()
+    frame["task"] = frame["task"].str.strip()
+    frame["sha256"] = frame["sha256"].str.strip().str.lower()
+
+    if set(frame["task"]) != {TASK}:
+        raise ValueError(f"Manifest task must be exactly {TASK!r}; do not mix it with Widal labels.")
     if set(frame["split"]) != {"train", "validation", "test"}:
         raise ValueError("Manifest must contain exactly train, validation and test splits.")
     if set(frame["label"]) != set(LABELS):
         raise ValueError(f"Manifest labels must be exactly {LABELS}.")
     if frame["image_path"].duplicated().any():
         raise ValueError("Duplicate image_path in manifest.")
+    if frame["sha256"].duplicated().any():
+        raise ValueError("Exact duplicate hashes remain in the manifest; rerun prepare_binary_manifest.py.")
 
-    for rel_path in frame["image_path"]:
-        resolved = (image_root / rel_path).resolve()
-        if image_root not in resolved.parents:
-            raise ValueError(f"Image path escapes image root: {rel_path}")
+    root = image_root.resolve()
+    if not root.is_dir():
+        raise FileNotFoundError(f"Image root does not exist: {root}")
+
+    for row in frame.itertuples(index=False):
+        resolved = (root / row.image_path).resolve()
+        if root not in resolved.parents:
+            raise ValueError(f"Image path escapes image root: {row.image_path}")
         if not resolved.is_file():
             raise FileNotFoundError(resolved)
+        if sha256_file(resolved) != row.sha256:
+            raise ValueError(f"Image checksum mismatch for {row.image_path}; rerun the audit and do not train.")
 
     for split in ("train", "validation", "test"):
         part = frame.loc[frame["split"] == split]
         if set(part["label"]) != set(LABELS):
             raise ValueError(f"Split {split} must contain both binary classes.")
 
-    return frame
+    group_audit = {"tokens_crossing_splits": 0, "example_tokens": []}
+    if "potential_group_token" in frame.columns:
+        token_frame = frame.loc[frame["potential_group_token"].fillna("").str.len() > 0]
+        for token, group in token_frame.groupby("potential_group_token"):
+            if group["split"].nunique() > 1:
+                group_audit["tokens_crossing_splits"] += 1
+                if len(group_audit["example_tokens"]) < 20:
+                    group_audit["example_tokens"].append(str(token))
+    group_audit["semantics"] = (
+        "unverified filename tokens; they may or may not identify a specimen/sample. "
+        "No patient/specimen-level independence claim is permitted."
+    )
+    group_audit["evaluation_scope"] = "image-level only"
+    return frame, group_audit
 
 
 def make_transforms():
@@ -112,11 +158,10 @@ def evaluate(model, loader, device):
     with torch.no_grad():
         for images, labels in loader:
             logits = model(images.to(device))
-            prediction = logits.argmax(dim=1).cpu().tolist()
+            predicted.extend(logits.argmax(dim=1).cpu().tolist())
             actual.extend(labels.tolist())
-            predicted.extend(prediction)
 
-    metrics = {
+    return {
         "accuracy": float(accuracy_score(actual, predicted)),
         "balanced_accuracy": float(balanced_accuracy_score(actual, predicted)),
         "macro_f1": float(f1_score(actual, predicted, average="macro", zero_division=0)),
@@ -129,13 +174,19 @@ def evaluate(model, loader, device):
             zero_division=0,
         ),
         "confusion_matrix": confusion_matrix(actual, predicted, labels=[0, 1]).tolist(),
+        "class_support": {
+            label: int(sum(value == LABEL_TO_INDEX[label] for value in actual))
+            for label in LABELS
+        },
     }
-    return metrics
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Train a separate binary agglutination benchmark model (not Widal)."
+        description=(
+            "Train a separate binary blood-agglutination benchmark model. "
+            "This is not a Widal reaction-grade model or clinical diagnostic model."
+        )
     )
     parser.add_argument("--manifest", required=True, type=Path)
     parser.add_argument("--image-root", required=True, type=Path)
@@ -146,8 +197,28 @@ def main() -> None:
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--no-pretrained", action="store_true")
+    parser.add_argument(
+        "--confirm-dataset-rights-reviewed",
+        action="store_true",
+        help="Confirm that exact dataset reuse/redistribution rights have been independently verified.",
+    )
+    parser.add_argument(
+        "--acknowledge-image-level-split-only",
+        action="store_true",
+        help="Acknowledge that specimen-level split independence is unverified; metrics are image-level only.",
+    )
     args = parser.parse_args()
 
+    if not args.confirm_dataset_rights_reviewed:
+        raise SystemExit(
+            "Training blocked: verify the exact dataset licence and reuse rights, "
+            "then pass --confirm-dataset-rights-reviewed."
+        )
+    if not args.acknowledge_image_level_split_only:
+        raise SystemExit(
+            "Training blocked: specimen-level independence is unknown. "
+            "After reviewing this limitation, pass --acknowledge-image-level-split-only for an image-level experiment."
+        )
     if args.epochs < 1 or args.batch_size < 1 or args.lr <= 0:
         raise SystemExit("epochs, batch-size and learning rate must be positive.")
 
@@ -158,7 +229,7 @@ def main() -> None:
     if not manifest_path.is_file() or not image_root.is_dir():
         raise SystemExit("Manifest or image root does not exist.")
 
-    frame = read_manifest(manifest_path, image_root)
+    frame, group_audit = read_manifest(manifest_path, image_root)
     train_frame = frame.loc[frame["split"] == "train"].reset_index(drop=True)
     val_frame = frame.loc[frame["split"] == "validation"].reset_index(drop=True)
     test_frame = frame.loc[frame["split"] == "test"].reset_index(drop=True)
@@ -201,55 +272,57 @@ def main() -> None:
 
     out_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_path = out_dir / "best_external_binary.pt"
-    best_score = -1.0
-    best_epoch = 0
+    manifest_hash = sha256_file(manifest_path)
+    best_score, best_epoch, stagnant = -1.0, 0, 0
     patience = 7
-    stagnant = 0
 
-    print(f"Device: {device}; task=external_agglutination_binary; NOT WIDAL")
-    print(f"Split sizes: train={len(train_ds)}, validation={len(val_ds)}, test={len(test_ds)}")
+    print(f"Device: {device}; task={TASK}; NOT WIDAL; evaluation=image-level only")
+    print(
+        f"Split sizes: train={len(train_ds)}, validation={len(val_ds)}, test={len(test_ds)}; "
+        f"unverified filename tokens crossing splits={group_audit['tokens_crossing_splits']}"
+    )
 
     for epoch in range(1, args.epochs + 1):
         model.train()
-        running_loss = 0.0
-        seen = 0
+        running_loss, seen = 0.0, 0
         progress = tqdm(train_loader, desc=f"Epoch {epoch}/{args.epochs}")
         for images, labels in progress:
-            images = images.to(device)
-            labels = labels.to(device)
+            images, labels = images.to(device), labels.to(device)
             optimizer.zero_grad(set_to_none=True)
-            logits = model(images)
-            loss = criterion(logits, labels)
+            loss = criterion(model(images), labels)
             loss.backward()
             optimizer.step()
             running_loss += float(loss.item()) * labels.size(0)
             seen += labels.size(0)
-            progress.set_postfix(loss=f"{running_loss / max(seen,1):.4f}")
+            progress.set_postfix(loss=f"{running_loss / max(seen, 1):.4f}")
 
         val_metrics = evaluate(model, val_loader, device)
         scheduler.step(val_metrics["macro_f1"])
         score = val_metrics["macro_f1"]
         print(
-            f"Epoch {epoch}: train_loss={running_loss / max(seen,1):.4f}, "
+            f"Epoch {epoch}: train_loss={running_loss / max(seen, 1):.4f}, "
             f"val_macro_f1={score:.4f}"
         )
 
         if score > best_score:
-            best_score = score
-            best_epoch = epoch
-            stagnant = 0
-            torch.save({
-                "model_state_dict": model.cpu().state_dict(),
-                "labels": LABELS,
-                "architecture": "mobilenet_v3_small",
-                "image_size": IMAGE_SIZE,
-                "mean": MEAN,
-                "std": STD,
-                "best_epoch": best_epoch,
-                "validation_macro_f1": best_score,
-                "task": "external_agglutination_binary",
-                "not_widal": True,
-            }, checkpoint_path)
+            best_score, best_epoch, stagnant = score, epoch, 0
+            torch.save(
+                {
+                    "model_state_dict": model.cpu().state_dict(),
+                    "labels": LABELS,
+                    "architecture": "mobilenet_v3_small",
+                    "image_size": IMAGE_SIZE,
+                    "mean": MEAN,
+                    "std": STD,
+                    "best_epoch": best_epoch,
+                    "validation_macro_f1": best_score,
+                    "manifest_sha256": manifest_hash,
+                    "task": TASK,
+                    "not_widal": True,
+                    "evaluation_scope": "image-level only; specimen-level independence not verified",
+                },
+                checkpoint_path,
+            )
             model.to(device)
         else:
             stagnant += 1
@@ -265,18 +338,19 @@ def main() -> None:
         "best_epoch": best_epoch,
         "test_images": len(test_ds),
         "split_source": "fixed source dataset split (train/validation/test)",
-        "patient_level_independence": "not verifiable: source manifest has no specimen IDs",
-        "task": "external_agglutination_binary",
+        "filename_group_audit": group_audit,
+        "patient_level_independence": "not verified; no documented specimen IDs",
+        "evaluation_scope": "image-level only",
+        "task": TASK,
         "not_widal": True,
+        "manifest_sha256": manifest_hash,
+        "dataset_rights_confirmed_by_operator": True,
         "note": (
-            "External binary blood-group agglutination benchmark only. "
-            "Metrics do not transfer to Widal reaction grades or clinical diagnosis."
+            "External binary blood-group/agglutination benchmark only. Metrics do not transfer "
+            "to Widal reaction grades, patient-level generalization, or clinical diagnosis."
         ),
     })
-
-    (out_dir / "metrics.json").write_text(
-        json.dumps(test_metrics, indent=2), encoding="utf-8"
-    )
+    (out_dir / "metrics.json").write_text(json.dumps(test_metrics, indent=2), encoding="utf-8")
     print(json.dumps({
         "checkpoint": str(checkpoint_path),
         "metrics": test_metrics,

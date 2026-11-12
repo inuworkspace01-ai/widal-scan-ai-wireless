@@ -128,36 +128,49 @@ See [DATA-SOURCES.md](DATA-SOURCES.md) for the source register, WHO/Kemenkes ref
 
 
 
-## External binary agglutination benchmark training (separate task)
+## External binary agglutination benchmark (separate task; not Widal)
 
-The repository includes a separate experiment for **Blood Agglutination Curated Dataset V1** (8,043 images) declared under CC BY 4.0 in its Data Card. It is a binary clumped/not-clumped blood-group/agglutination dataset, **not a Widal dataset**. Do not use these labels as Widal 0, 1+, 2+, 3+, or 4+.
+The uploaded **Blood Agglutination Curated Dataset V1** contains 8,043 JPEG RGB images at 224×224, split into train/validation/test, with binary `clumped` and `not_clumped` labels. This is a blood-group/agglutination benchmark, **not a Widal slide dataset**. Never map these labels to Widal grades `0`, `1+`, `2+`, `3+`, or `4+`.
 
-After downloading the archive from https://doi.org/10.5281/zenodo.21384197 and verifying the Data Card, organize it as:
+### Audit of the uploaded archive (13 November 2026)
+
+- 8,043/8,043 images were readable; all were 224×224 JPEG RGB.
+- The audit found 174 same-label exact-duplicate groups (174 extra copies) and 22 exact-image groups assigned to both labels (44 files). The manifest builder retains one copy of same-label duplicates and excludes all copies of label-conflict groups.
+- The resulting candidate manifest contains 7,825 unique image files and has no remaining exact-byte duplicates.
+- No exact-byte duplicates were found across the provided splits. However, 438 filename tokens such as `A-14` / `AB-75` occur in multiple splits. The archive does not define these tokens, so they may indicate sample-level overlap; patient/specimen-level independence is **not verified**.
+- The archive's `CITATION.cff` says the licence is pending verification and its `DATASET_CARD.md` says the original source is unavailable. The README points to a Roboflow project that currently displays CC BY 4.0, but the archive-to-source/version relationship is not documented. **Do not train, redistribute, or use commercially until the exact rights and source lineage are confirmed.**
+- No model has been trained from this archive and no WIDAL-SCAN performance metric exists.
+
+See [DATASET-AUDIT.md](DATASET-AUDIT.md) for the detailed findings.
+
+After the exact dataset reuse rights have been verified, place the archive's extracted folders under `services/ai/external-data/`:
 
 ```text
 external-data/
-  train/
-    clumped/
-    not_clumped/
-  valid/
-    clumped/
-    not_clumped/
-  test/
-    clumped/
-    not_clumped/
+  train/clumped/
+  train/not_clumped/
+  valid/clumped/
+  valid/not_clumped/
+  test/clumped/
+  test/not_clumped/
 ```
 
-Keep the original split. The source Data Card does not expose donor/specimen IDs, so patient-level independence cannot be established by this project. The manifest builder verifies file readability and exact image hashes across splits, but that is not a substitute for specimen-level grouping.
+Run the manifest audit first:
 
 ```powershell
 python prepare_binary_manifest.py --dataset-root external-data --output external-data/manifest.csv
-python train_external_binary.py --manifest external-data/manifest.csv --image-root external-data --out-dir artifacts/external-binary --epochs 30 --batch-size 32
 ```
 
-The resulting model is stored as `artifacts/external-binary/best_external_binary.pt`, with metrics in `metrics.json`. These are external binary agglutination benchmark results only. They must not be reported as WIDAL-SCAN performance, used to grade Widal wells, or used for clinical decisions.
+This writes `manifest.csv`, `manifest.audit.json`, and `manifest_duplicates.csv`. The manifest excludes exact duplicate copies and contradictory-label image hashes. It reports filename tokens but does not guess whether they represent specimen IDs.
 
-The third-party calibrated model at https://huggingface.co/sayon-mitra024/blood-agglutination-classifier can be inspected as a literature/benchmark reference. Its reported metrics belong to that author's dataset and protocol only; they are not transferred to this project.
+Training is deliberately gated. Only after the dataset's exact reuse licence is independently verified, and after accepting that this is an image-level benchmark rather than a specimen-independent evaluation, run:
 
+```powershell
+python train_external_binary.py --manifest external-data/manifest.csv --image-root external-data --out-dir artifacts/external-binary --epochs 30 --batch-size 32 --confirm-dataset-rights-reviewed --acknowledge-image-level-split-only
+```
+
+The resulting checkpoint and metrics are research-only external binary benchmark artifacts. They must not be reported as WIDAL-SCAN performance, used to grade Widal wells, or used for clinical decisions. Keep source images and model artifacts out of GitHub.
+ 
 ## Guarded automatic candidate retraining (Windows)
 
 The scheduled job is intended to keep a research candidate up to date when new **ATLM-approved visual labels** are added. It does not train from every captured image, does not invent labels, and does not promote a new model to a live workflow.
