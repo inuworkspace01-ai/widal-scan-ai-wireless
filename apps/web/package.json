@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "tsc --noEmit",
-    "seed:accounts": "node --env-file=.env.accounts scripts/seed-accounts.mjs"
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
