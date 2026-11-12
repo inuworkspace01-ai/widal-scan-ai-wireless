@@ -87,9 +87,10 @@ export default function Home() {
       return;
     }
 
+    const client = supabase;
     let active = true;
     async function restoreSession() {
-      const { data, error } = await supabase.auth.getSession();
+      const { data, error } = await client.auth.getSession();
       if (!active) return;
       if (error) setAuthError("Sesi tidak dapat dibaca. Silakan login kembali.");
       if (data.session?.user) {
@@ -101,7 +102,7 @@ export default function Home() {
 
         if (!active) return;
         if (profileError || !row || !row.is_active || !["admin", "atlm"].includes(row.role)) {
-          await supabase.auth.signOut();
+          await client.auth.signOut();
           setAuthError("Akun tidak aktif atau belum memiliki role aplikasi.");
         } else {
           setProfile(row as Profile);
