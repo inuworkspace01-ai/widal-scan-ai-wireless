@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import {
   Activity, ArrowLeft, CheckCircle2, CircleAlert, KeyRound,
-  ExternalLink, LoaderCircle, LockKeyhole, RefreshCw, ShieldCheck,
+  Copy, ExternalLink, LoaderCircle, LockKeyhole, RefreshCw, ShieldCheck,
 } from "lucide-react";
 
 type SetupStatus = {
@@ -16,19 +16,19 @@ type SetupStatus = {
 const REQUIRED_ENV = [
   {
     key: "NEXT_PUBLIC_SUPABASE_URL",
-    description: "Alamat project Supabase untuk koneksi aplikasi.",
+    description: "Supabase → Connect → Project URL (dipakai browser saat login).",
   },
   {
     key: "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
-    description: "Kunci publik untuk login dari browser.",
+    description: "Supabase → Settings → API Keys → Publishable key.",
   },
   {
     key: "SUPABASE_SECRET_KEY",
-    description: "Kunci rahasia server untuk membuat akun awal.",
+    description: "Supabase → Settings → API Keys → Secret key. Jangan dibagikan.",
   },
   {
     key: "BOOTSTRAP_SETUP_TOKEN",
-    description: "Token acak minimal 32 karakter untuk mengunci proses setup.",
+    description: "Token acak 64 karakter. Bisa dibuat langsung dari halaman ini.",
   },
 ] as const;
 type SetupResponse = {
@@ -42,6 +42,8 @@ export default function SetupPage() {
   const [status, setStatus] = useState<SetupStatus | null>(null);
   const [checkingStatus, setCheckingStatus] = useState(false);
   const [token, setToken] = useState("");
+  const [generatedSetupToken, setGeneratedSetupToken] = useState("");
+  const [tokenCopied, setTokenCopied] = useState(false);
   const ACCOUNT_IDS = ["inuu", "avi_lab", "riska_lab"] as const;
   type AccountId = (typeof ACCOUNT_IDS)[number];
   const [passwords, setPasswords] = useState<Record<AccountId, string>>({ inuu: "", avi_lab: "", riska_lab: "" });
@@ -97,6 +99,24 @@ export default function SetupPage() {
     setVisible(true);
     setResult(null);
     setError("");
+  }
+
+  function generateSetupToken() {
+    const bytes = new Uint8Array(32);
+    window.crypto.getRandomValues(bytes);
+    const generated = Array.from(bytes, (value) => value.toString(16).padStart(2, "0")).join("");
+    setGeneratedSetupToken(generated);
+    setTokenCopied(false);
+  }
+
+  async function copySetupToken() {
+    if (!generatedSetupToken) return;
+    try {
+      await navigator.clipboard.writeText(generatedSetupToken);
+      setTokenCopied(true);
+    } catch {
+      setError("Browser tidak mengizinkan salin otomatis. Pilih token lalu salin secara manual.");
+    }
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -215,7 +235,27 @@ export default function SetupPage() {
                 <a href="https://vercel.com/inuworkspace01-3852/widal-scan-ai-wireless/settings/environment-variables" target="_blank" rel="noreferrer">
                   Buka Environment Variables Vercel <ExternalLink size={13}/>
                 </a>
-                <p><strong>Catatan:</strong> menghubungkan Supabase sebagai integrasi tidak selalu memasukkan key ke Environment Variables project Vercel. Pastikan empat variable ini benar-benar ditambahkan pada project yang menjalankan website.</p>
+                {!status?.presence?.BOOTSTRAP_SETUP_TOKEN && (
+                  <div className="setupTokenGenerator">
+                    <div>
+                      <b>Buat token setup tanpa PowerShell</b>
+                      <p>Token acak 64 karakter dibuat di browser ini. Salin ke Vercel sebagai variable sensitif <code>BOOTSTRAP_SETUP_TOKEN</code>, lalu simpan salinannya untuk dimasukkan pada langkah setup akun.</p>
+                    </div>
+                    {!generatedSetupToken ? (
+                      <button type="button" className="setupRefresh" onClick={generateSetupToken}>
+                        <KeyRound size={15}/> Buat token acak
+                      </button>
+                    ) : (
+                      <div className="setupGeneratedToken">
+                        <code>{generatedSetupToken}</code>
+                        <button type="button" className="setupRefresh" onClick={() => void copySetupToken()}>
+                          {tokenCopied ? <><CheckCircle2 size={14}/> Tersalin</> : <><Copy size={14}/> Salin token</>}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+                <p><strong>Catatan:</strong> menghubungkan Supabase sebagai integrasi tidak otomatis memasukkan key ke Environment Variables project Vercel. Pastikan keempat variable benar-benar ditambahkan pada project yang menjalankan website.</p>
               </div>
             )}
 
