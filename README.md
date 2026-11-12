@@ -25,16 +25,16 @@ uvicorn app.main:app --host 127.0.0.1 --port 8765
 Simulation mode is enabled by default and creates a synthetic placeholder, not a specimen.
 
 ## Supabase
-Run `supabase/migrations/001_initial_schema.sql`, `002_username_accounts.sql`, and `003_role_scoped_access.sql` in Supabase SQL Editor before initializing user accounts. Migration 003 limits each lab user to examinations they created; admins/reviewers retain review access. Review security policies before enabling real users. Do not store patient identifiers in this prototype.
+Run `supabase/migrations/001_initial_schema.sql`, `002_username_accounts.sql`, `003_role_scoped_access.sql`, and `004_initial_accounts_and_single_admin.sql` in Supabase SQL Editor before initializing user accounts. Migration 003 limits each lab user to examinations they created; admins/reviewers retain review access. Review security policies before enabling real users. Do not store patient identifiers in this prototype.
 
 **ALL SYSTEM PROVIDE BY INUU**
 
 ## Role-based login
 
 The first dashboard accounts are provisioned as:
-- `inuu` — super admin (database role `admin`)
-- `inu` — super admin (database role `admin`)
-- `lab` — laboratory user (database role `atlm`)
+- `inuu` — sole super admin (database role `admin`, display name `Inuu`)
+- `avi_lab` — laboratory user (database role `atlm`, display name `Avi_Lab`)
+- `riska_lab` — laboratory user (database role `atlm`, display name `Riska_lab`)
 
 No default passwords are committed. Create a Supabase project and run migrations `001_initial_schema.sql`, `002_username_accounts.sql`, and `003_role_scoped_access.sql` in Supabase SQL Editor.
 
@@ -44,7 +44,7 @@ Configure Vercel Project → Settings → Environment Variables:
 - `SUPABASE_SECRET_KEY` — server-only Supabase secret key (`sb_secret_...`); never prefix with `NEXT_PUBLIC_`. The legacy `SUPABASE_SERVICE_ROLE_KEY` is also accepted temporarily.
 - `BOOTSTRAP_SETUP_TOKEN` — a random secret of at least 32 characters.
 
-Redeploy, open `/setup`, enter the setup token, and create three different passwords (minimum 12 characters) for `inuu`, `inu`, and `lab`. The wizard creates the Supabase Auth accounts and matching profiles. It does not need Node.js or npm on the client PC. The initial setup endpoint refuses to run again after all three profile records exist.
+Redeploy, open `/setup`, enter the setup token, and create three different passwords (minimum 12 characters) for `Inuu`, `Avi_Lab`, and `Riska_lab`. The wizard creates the Supabase Auth accounts and matching profiles. It does not need Node.js or npm on the client PC. The initial setup endpoint refuses to run again after all three profile records exist.
 
 After successful setup, remove `SUPABASE_SECRET_KEY` (or legacy `SUPABASE_SERVICE_ROLE_KEY`) and `BOOTSTRAP_SETUP_TOKEN` from Vercel and redeploy to close the setup endpoint. Keep only the two `NEXT_PUBLIC_*` browser variables for sign-in.
 
