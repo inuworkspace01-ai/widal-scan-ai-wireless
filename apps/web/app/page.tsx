@@ -33,7 +33,7 @@ const SOURCES = [
     title: "Typhoid Dataset — Kaggle",
     kind: "Candidate dataset · tabular",
     status: "Needs verification",
-    description: "A 2026 paper describes a 31,087-record Kaggle Typhoid Multi-Class dataset. This listing is only a candidate; its identity with the paper dataset is not verified. Inspect files, labels, provenance and licence before use.",
+    description: "A 2026 paper links to this exact Kaggle listing and describes 31,087 anonymised records, 21 variables and four classes. Verify the CSV schema, label quality, provenance and licence before use.",
     url: "https://www.kaggle.com/datasets/rajmohnani12/typhoid-dataset",
     note: "For exploratory clinical-feature research only; not image labels."
   },
