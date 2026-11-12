@@ -146,3 +146,41 @@
 .autoTrainPanel .notice{margin:14px 0}
 @media(max-width:850px){.autoTrainGrid{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.autoTrainGrid{grid-template-columns:1fr}}
+
+
+/* Clear environment configuration checklist */
+.setupConfigPanel{width:min(100%,690px);margin:14px 0 18px;padding:17px;border:1px solid #e4ebf0;border-radius:13px;background:#fbfdff}
+.setupConfigHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+.setupConfigHeader b{display:block;color:#263b50;font-size:12px}
+.setupConfigHeader p{margin:5px 0 0;color:#8293a2;font-size:10px;line-height:1.6}
+.setupConfigBadge{flex-shrink:0;border-radius:30px;padding:6px 9px;font-size:8px;font-weight:900;letter-spacing:.7px}
+.setupConfigBadge.ready{background:#e7f7ef;color:#167b54}
+.setupConfigBadge.missing{background:#fff3df;color:#946b25}
+.setupEnvList{display:grid;gap:8px}
+.setupEnvRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid #e7edf2;border-radius:9px;background:#fff}
+.setupEnvCopy{display:grid;gap:5px;min-width:0}
+.setupEnvCopy code{display:block;width:fit-content;max-width:100%;overflow-wrap:anywhere;white-space:normal;color:#196d78;background:#edf7f7;border-radius:5px;padding:5px 7px;font:800 9px ui-monospace,SFMono-Regular,Consolas,monospace}
+.setupEnvCopy small{display:block;color:#8594a1;font-size:9px;line-height:1.45}
+.setupEnvState{flex-shrink:0;border-radius:30px;padding:6px 8px;font-size:7px;font-weight:900;letter-spacing:.6px;white-space:nowrap}
+.setupEnvState.ready{background:#e7f7ef;color:#167b54}
+.setupEnvState.missing{background:#fff0ed;color:#b24c42}
+.setupConfigHelp{margin-top:13px;padding:13px;border:1px solid #f1e2c1;border-radius:10px;background:#fff9ee;color:#7c6437}
+.setupConfigHelp>b{display:block;font-size:10px}
+.setupConfigHelp ol{margin:8px 0 10px;padding-left:18px;font-size:9px;line-height:1.8;color:#8c7449}
+.setupConfigHelp a{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border-radius:8px;background:#fff0d6;color:#805c23;text-decoration:none;font-size:9px;font-weight:900}
+.setupConfigHelp a:hover{background:#fbe7c5}
+.setupConfigHelp p{margin:11px 0 0;color:#967e54;font-size:9px;line-height:1.6}
+.setupRefresh{display:inline-flex;align-items:center;justify-content:center;gap:7px;margin-top:12px;padding:9px 11px;border:1px solid #dce6ed;border-radius:8px;background:#fff;color:#456477;font-size:9px;font-weight:800;cursor:pointer}
+.setupRefresh:hover{background:#f3f9fa;border-color:#b9d8d9}
+.setupRefresh:disabled{opacity:.55;cursor:wait}
+.setupFormDisabled{display:flex;align-items:flex-start;gap:11px;padding:14px;border:1px dashed #dce5ec;border-radius:11px;background:#f7fafc;color:#7890a1}
+.setupFormDisabled>svg{flex-shrink:0;color:#8ca0ae}
+.setupFormDisabled b{display:block;color:#516c7e;font-size:10px}
+.setupFormDisabled p{margin:5px 0 0;font-size:9px;line-height:1.6;color:#8798a5}
+@media(max-width:520px){
+ .setupConfigPanel{padding:12px}
+ .setupConfigHeader{align-items:flex-start}
+ .setupEnvRow{align-items:flex-start;padding:10px;gap:8px}
+ .setupEnvCopy code{font-size:8px}
+ .setupEnvState{margin-top:2px}
+}
