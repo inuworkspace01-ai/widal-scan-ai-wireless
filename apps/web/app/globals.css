@@ -135,3 +135,14 @@
 .setupReminder{background:#f5f9fc;border:1px solid #e0eaf1;border-radius:9px;padding:11px 12px;color:#687d90;font-size:9px;line-height:1.6}
 .setupAccountHead{flex-wrap:wrap}
 @media(max-width:520px){.generatePassword{margin-left:auto}.setupAccountHead em{margin-left:auto}}
+
+
+/* Guarded automatic training status panel */
+.autoTrainPanel{border:1px solid #dcece9;background:linear-gradient(145deg,#fff 0%,#f8fcfb 100%)}
+.autoTrainGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+.autoTrainGrid>div{border:1px solid #e1ecea;background:#fff;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:7px}
+.autoTrainGrid b{font-size:10px;color:#2b4657}
+.autoTrainGrid small{font-size:9px;line-height:1.55;color:#8798a4}
+.autoTrainPanel .notice{margin:14px 0}
+@media(max-width:850px){.autoTrainGrid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.autoTrainGrid{grid-template-columns:1fr}}
