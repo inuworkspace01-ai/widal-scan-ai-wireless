@@ -74,3 +74,56 @@
 .roleBadge.admin{background:#e9f4ff;color:#3474a7}.roleBadge.lab{background:#e8f7f2;color:#16865f}
 @media(max-width:900px){.loginShell{grid-template-columns:1fr}.loginIntro{min-height:420px;padding:90px 35px 40px}.loginBrand{left:35px;right:35px}.loginCopyright{margin-top:25px}.workflow{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:580px){.loginIntro{min-height:390px;padding:90px 22px 32px}.loginIntro h1{font-size:37px}.loginLead{font-size:12px;margin:18px 0 25px}.loginFeatureGrid{gap:8px}.loginFeatureGrid>div{padding:11px}.loginPanelWrap{padding:20px 14px}.loginPanel{padding:25px 20px}.userText{display:none}.sectionIntro{align-items:flex-start;flex-direction:column}.sourceCard{padding:14px}.sourceHeading{flex-direction:column;gap:8px}.workflow{grid-template-columns:1fr 1fr}.roleBadge{font-size:7px}.content{padding:14px}}
+
+
+/* First-time account setup */
+.firstSetupLink{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;margin-top:16px;text-align:center;text-decoration:none;color:#91a1ae;font-size:10px}
+.firstSetupLink b{display:inline-flex;align-items:center;gap:3px;color:#07898b;font-weight:800}
+.firstSetupLink:hover b{text-decoration:underline}
+.setupShell{min-height:100vh;display:grid;grid-template-columns:minmax(330px,.72fr) minmax(520px,1.28fr);background:#f4f7fa;color:#1d3044}
+.setupHero{min-height:100vh;display:flex;flex-direction:column;padding:36px clamp(25px,5vw,70px);color:#eaf5f9;background:radial-gradient(circle at 16% 73%,rgba(27,179,169,.22),transparent 35%),linear-gradient(150deg,#102238,#123d51 62%,#0d6670);position:sticky;top:0;height:100vh}
+.setupBrand{display:flex;align-items:center;gap:12px}.setupBrandIcon{width:42px;height:42px;display:grid;place-items:center;background:#0e9295;border-radius:13px;color:white}
+.setupBrand b{display:block;font:800 13px Manrope;letter-spacing:.2px}.setupBrand small{display:block;color:#8ba9bb;font-size:8px;letter-spacing:2px;margin-top:4px}
+.setupHeroContent{margin:auto 0;max-width:460px}.setupKicker{font-size:9px;letter-spacing:2.5px;font-weight:800;color:#69d9d2}
+.setupHeroContent h1{font:800 clamp(34px,4vw,55px) Manrope;line-height:1.12;letter-spacing:-1.8px;margin:18px 0}.setupHeroContent h1 em{font-style:normal;color:#55d9d0}
+.setupHeroContent p{font-size:13px;line-height:1.85;color:#bfd4dd;max-width:410px}
+.setupTrust{display:flex;align-items:center;gap:9px;margin-top:30px;padding:13px 15px;border:1px solid rgba(133,222,217,.23);background:rgba(255,255,255,.055);border-radius:11px;color:#9fe5df;font-size:10px;font-weight:700}
+.setupHeroFoot{font-size:8px;letter-spacing:2px;color:#7396a9}
+.setupMain{min-width:0;padding:26px clamp(18px,4vw,54px) 34px;display:flex;flex-direction:column;align-items:center}
+.setupTop{width:min(100%,690px);display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.backLink{display:inline-flex;align-items:center;gap:7px;color:#718396;font-size:11px;font-weight:700;text-decoration:none}.backLink:hover{color:#087f86}
+.setupStep{font-size:8px;letter-spacing:1.6px;font-weight:800;color:#9ba9b5}
+.setupCard{width:min(100%,690px);background:white;border:1px solid #e4ebf0;border-radius:19px;padding:clamp(21px,3vw,34px);box-shadow:0 18px 55px rgba(31,54,75,.07)}
+.setupIcon{width:45px;height:45px;display:grid;place-items:center;border-radius:14px;color:#078b8c;background:#e5f6f3;margin-bottom:17px}
+.setupCard h2{font:800 23px Manrope;color:#1b2d42;margin:7px 0 8px}
+.setupLead{font-size:11px;color:#8494a3;line-height:1.7;margin:0 0 19px}
+.setupStatus{display:flex;align-items:center;gap:9px;padding:12px 13px;border:1px solid #e1eaf0;background:#f6f9fb;border-radius:10px;color:#62788b;font-size:10px}
+.setupStatus.ready{background:#eff9f5;border-color:#d1eee0;color:#247e5a}
+.setupMissing{display:flex;align-items:flex-start;gap:11px;padding:13px;background:#fff8e9;border:1px solid #f2e3c0;color:#80632e;border-radius:11px;margin:14px 0}
+.setupMissing>svg{flex-shrink:0;margin-top:1px}.setupMissing b{font-size:11px}.setupMissing p{font-size:10px;line-height:1.65;margin:5px 0 9px;color:#8c7447}
+.setupMissing code{display:inline-block;margin:0 5px 5px 0;padding:5px 7px;background:#f7edda;border-radius:5px;color:#715a2b;font-size:9px;overflow-wrap:anywhere}
+.setupMissing small{display:block;font-size:9px;line-height:1.6;color:#987f51;margin-top:5px}
+.setupForm{display:grid;gap:13px;margin-top:17px}
+.setupLabel{display:grid;gap:7px;color:#50667a;font-size:10px;font-weight:800}
+.setupLabel input{width:100%;height:42px;border:1px solid #dce6ed;background:#fbfdfe;border-radius:9px;padding:0 11px;outline:none;color:#1c3044;font:12px 'DM Sans'}
+.setupLabel input:focus{border-color:#0e999a;box-shadow:0 0 0 3px rgba(14,153,154,.09)}
+.setupFormDivider{display:flex;align-items:center;gap:10px;margin-top:5px;color:#95a4b0;font-size:8px;letter-spacing:1.7px;font-weight:800}
+.setupFormDivider:after{content:"";height:1px;background:#edf1f4;flex:1}
+.setupAccount{border:1px solid #e6edf2;border-radius:12px;padding:13px;display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#fcfdfe}
+.setupAccountHead{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin-bottom:1px}
+.setupAvatar{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:#e6f5f3;color:#078587;font:800 13px Manrope}
+.setupAccountHead>span:nth-child(2){flex:1}.setupAccountHead b{display:block;color:#263b50;font-size:11px}.setupAccountHead small{display:block;margin-top:3px;font-size:9px;color:#90a0ad}.setupAccountHead small strong{color:#087f86}
+.setupAccountHead em{font-style:normal;padding:5px 8px;border-radius:30px;background:#edf5fb;color:#4e7597;font-size:8px;font-weight:800}
+.setupShow{display:flex;align-items:center;gap:8px;color:#708395;font-size:10px}
+.setupShow input{width:14px;height:14px;accent-color:#07898b}
+.setupAlert{display:flex;align-items:flex-start;gap:8px;padding:11px 12px;border-radius:9px;background:#fff0ef;border:1px solid #f1d2cf;color:#af473f;font-size:10px;line-height:1.5}
+.setupSuccess{display:flex;align-items:flex-start;gap:10px;padding:13px;border-radius:10px;background:#eef9f3;border:1px solid #ccebd9;color:#207b56}
+.setupSuccess>svg{flex-shrink:0}.setupSuccess b{display:block;font-size:11px}.setupSuccess p{font-size:10px;line-height:1.6;margin:5px 0;color:#4e8268}.setupSuccess a{font-size:10px;font-weight:800;color:#087b59;text-decoration:none}
+.setupSubmit{height:47px;border:0;border-radius:10px;background:linear-gradient(100deg,#087f86,#0c9b99);display:flex;align-items:center;justify-content:center;gap:9px;color:white;font:800 11px 'DM Sans';cursor:pointer;box-shadow:0 8px 16px rgba(8,127,134,.16)}
+.setupSubmit:disabled{opacity:.45;cursor:not-allowed}
+.setupFootnote{display:flex;align-items:flex-start;gap:7px;margin-top:16px;font-size:9px;line-height:1.55;color:#92a0ab}
+.setupFootnote svg{flex-shrink:0;color:#168e80}
+.setupPageFooter{margin-top:auto;padding:24px 0 0;color:#a4afb8;font-size:8px;letter-spacing:1.5px;text-align:center}
+.spin{animation:setupSpin 1s linear infinite}@keyframes setupSpin{to{transform:rotate(360deg)}}
+@media(max-width:900px){.setupShell{grid-template-columns:1fr}.setupHero{position:relative;min-height:260px;height:auto;padding:25px 24px}.setupHeroContent{margin:35px 0 25px}.setupHeroContent h1{font-size:34px}.setupHeroContent p{font-size:11px}.setupHeroFoot{margin-top:5px}.setupMain{padding:23px 16px 30px}}
+@media(max-width:520px){.setupAccount{grid-template-columns:1fr}.setupAccountHead{grid-column:1}.setupHeroContent{margin:25px 0 18px}.setupTop{margin-bottom:15px}.setupCard{padding:20px 15px}.setupAccountHead em{font-size:7px}.setupMain{padding:16px 10px 25px}}
