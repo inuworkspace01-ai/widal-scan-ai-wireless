@@ -41,12 +41,12 @@ No default passwords are committed. Create a Supabase project and run migrations
 Configure Vercel Project → Settings → Environment Variables:
 - `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL.
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — Supabase publishable/anon key.
-- `SUPABASE_SERVICE_ROLE_KEY` — server-only service role secret; never prefix with `NEXT_PUBLIC_`.
+- `SUPABASE_SECRET_KEY` — server-only Supabase secret key (`sb_secret_...`); never prefix with `NEXT_PUBLIC_`. The legacy `SUPABASE_SERVICE_ROLE_KEY` is also accepted temporarily.
 - `BOOTSTRAP_SETUP_TOKEN` — a random secret of at least 32 characters.
 
 Redeploy, open `/setup`, enter the setup token, and create three different passwords (minimum 12 characters) for `inuu`, `inu`, and `lab`. The wizard creates the Supabase Auth accounts and matching profiles. It does not need Node.js or npm on the client PC. The initial setup endpoint refuses to run again after all three profile records exist.
 
-After successful setup, remove `SUPABASE_SERVICE_ROLE_KEY` and `BOOTSTRAP_SETUP_TOKEN` from Vercel and redeploy to close the setup endpoint. Keep only the two `NEXT_PUBLIC_*` browser variables for sign-in.
+After successful setup, remove `SUPABASE_SECRET_KEY` (or legacy `SUPABASE_SERVICE_ROLE_KEY`) and `BOOTSTRAP_SETUP_TOKEN` from Vercel and redeploy to close the setup endpoint. Keep only the two `NEXT_PUBLIC_*` browser variables for sign-in.
 
 ID login uses internal aliases in the reserved `.invalid` domain and Supabase Auth password verification. It does not send email.
 
