@@ -1,16 +1,10 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient, type User } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const ACCOUNT_DEFINITIONS = [
-  { username: "inuu", displayName: "Inuu", role: "admin" as const },
-  { username: "avi_lab", displayName: "Avi_Lab", role: "atlm" as const },
-  { username: "riska_lab", displayName: "Riska_lab", role: "atlm" as const },
-];
-
+const ACCOUNT_IDS = ["inuu", "avi_lab", "riska_lab"] as const;
 type SetupBody = {
   token?: unknown;
   passwords?: Record<string, unknown>;
@@ -28,7 +22,7 @@ function json(message: string, status: number, extra: Record<string, unknown> = 
     {
       status,
       headers: {
-        "Cache-Control": "no-store, max-age=0",
+        "Cache-Control": "no-store, no-cache, max-age=0, must-revalidate",
         "Pragma": "no-cache",
       },
     }
@@ -49,13 +43,14 @@ export async function POST(request: NextRequest) {
   }
 
   const expectedToken = process.env.BOOTSTRAP_SETUP_TOKEN;
-  const supabaseUrl =
-    process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const publishableKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!expectedToken || expectedToken.length < 32 || !supabaseUrl || !serviceRoleKey) {
+  if (!expectedToken || expectedToken.length < 32 || !supabaseUrl || !publishableKey) {
     return json(
-      "Setup belum siap. Admin perlu mengisi NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY (atau legacy SUPABASE_SERVICE_ROLE_KEY), dan BOOTSTRAP_SETUP_TOKEN di Vercel Environment Variables.",
+      "Setup belum siap. Diperlukan NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, dan BOOTSTRAP_SETUP_TOKEN di environment Vercel.",
       503
     );
   }
@@ -67,148 +62,60 @@ export async function POST(request: NextRequest) {
     return json("Format permintaan tidak valid.", 400);
   }
 
-  if (
-    typeof body.token !== "string" ||
-    !safeTokenMatch(body.token, expectedToken)
-  ) {
-    return json("Setup token salah. Periksa token yang dimasukkan.", 401);
+  if (typeof body.token !== "string" || !safeTokenMatch(body.token, expectedToken)) {
+    return json("Setup token salah. Periksa token setup.", 401);
   }
 
-  const passwordEntries = body.passwords;
-  if (!passwordEntries || typeof passwordEntries !== "object") {
+  if (!body.passwords || typeof body.passwords !== "object") {
     return json("Password untuk ketiga akun wajib diisi.", 400);
   }
 
-  const passwords = ACCOUNT_DEFINITIONS.map((account) => {
-    const value = passwordEntries[account.username];
-    return typeof value === "string" ? value : "";
-  });
-
-  for (let index = 0; index < passwords.length; index += 1) {
-    const password = passwords[index];
-    if (password.length < 12 || password.length > 128) {
-      return json(
-        "Setiap password harus memiliki panjang 12–128 karakter.",
-        400
-      );
-    }
-    if (/^(.)\1+$/.test(password) || password.toLowerCase() === ACCOUNT_DEFINITIONS[index].username) {
-      return json("Gunakan password yang kuat dan tidak sama dengan ID akun.", 400);
-    }
+  const passwords = ACCOUNT_IDS.map((id) => body.passwords?.[id]);
+  if (passwords.some((value) => typeof value !== "string" || value.length < 12 || value.length > 128)) {
+    return json("Setiap password harus memiliki panjang 12–128 karakter.", 400);
   }
 
-  if (new Set(passwords).size !== passwords.length) {
-    return json("Gunakan password yang berbeda untuk setiap akun.", 400);
+  const normalizedPasswords = passwords as string[];
+  if (new Set(normalizedPasswords).size !== ACCOUNT_IDS.length) {
+    return json("Gunakan password berbeda untuk setiap akun.", 400);
   }
 
-  const supabase = createClient(supabaseUrl, serviceRoleKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-
-  async function findAuthUser(email: string): Promise<User | null> {
-    for (let page = 1; page <= 10; page += 1) {
-      const { data, error } = await supabase.auth.admin.listUsers({
-        page,
-        perPage: 1000,
-      });
-      if (error) throw error;
-
-      const found = data.users.find(
-        (user) => user.email?.toLowerCase() === email.toLowerCase()
-      );
-      if (found) return found;
-      if (data.users.length < 1000) return null;
-    }
-
-    throw new Error("Account lookup exceeded the supported page range.");
+  if (normalizedPasswords.some((value, index) =>
+    /^(.)\\1+$/.test(value) || value.toLowerCase() === ACCOUNT_IDS[index]
+  )) {
+    return json("Gunakan password yang kuat dan tidak sama dengan ID akun.", 400);
   }
-
-  const completed: string[] = [];
 
   try {
-    const { data: existingProfiles, error: profileLookupError } = await supabase
-      .from("profiles")
-      .select("username")
-      .in("username", ACCOUNT_DEFINITIONS.map((account) => account.username));
+    const edgeResponse = await fetch(supabaseUrl.replace(/\\/$/, "") + "/functions/v1/bootstrap-accounts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": publishableKey,
+        "x-setup-token": expectedToken,
+      },
+      body: JSON.stringify({
+        passwords: {
+          inuu: normalizedPasswords[0],
+          avi_lab: normalizedPasswords[1],
+          riska_lab: normalizedPasswords[2],
+        },
+      }),
+      cache: "no-store",
+    });
 
-    if (profileLookupError) throw profileLookupError;
-
-    const existingIds = new Set(
-      (existingProfiles || []).map((profile) => profile.username)
-    );
-    if (ACCOUNT_DEFINITIONS.every((account) => existingIds.has(account.username))) {
-      return json(
-        "Setup awal sudah pernah diselesaikan. Hapus BOOTSTRAP_SETUP_TOKEN dari Vercel; gunakan menu reset password resmi bila diperlukan.",
-        409,
-        { setupComplete: true }
-      );
-    }
-
-    for (let index = 0; index < ACCOUNT_DEFINITIONS.length; index += 1) {
-      const account = ACCOUNT_DEFINITIONS[index];
-      const email = account.username + "@login.widal-scan.invalid";
-      let user = await findAuthUser(email);
-
-      if (!user) {
-        const { data, error } = await supabase.auth.admin.createUser({
-          email,
-          password: passwords[index],
-          email_confirm: true,
-          user_metadata: { username: account.username },
-        });
-
-        if (error) {
-          // Handle a simultaneous first-time setup attempt without changing
-          // an existing account password.
-          user = await findAuthUser(email);
-          if (!user) throw error;
-          const { error: passwordError } = await supabase.auth.admin.updateUserById(
-            user.id,
-            { password: passwords[index] }
-          );
-          if (passwordError) throw passwordError;
-        } else {
-          user = data.user;
-        }
-      } else {
-        const { error: passwordError } = await supabase.auth.admin.updateUserById(
-          user.id,
-          { password: passwords[index] }
-        );
-        if (passwordError) throw passwordError;
-      }
-
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .upsert(
-          {
-            user_id: user.id,
-            username: account.username,
-            display_name: account.displayName,
-            role: account.role,
-            is_active: true,
-          },
-          { onConflict: "user_id" }
-        );
-
-      if (profileError) throw profileError;
-      completed.push(account.username);
-    }
-
+    const payload = await edgeResponse.json().catch(() => ({}));
+    return NextResponse.json(payload, {
+      status: edgeResponse.status,
+      headers: {
+        "Cache-Control": "no-store, no-cache, max-age=0, must-revalidate",
+        "Pragma": "no-cache",
+      },
+    });
+  } catch {
     return json(
-      "Ketiga akun berhasil disiapkan. Hapus BOOTSTRAP_SETUP_TOKEN dari Vercel setelah proses ini selesai.",
-      200,
-      { accounts: completed, nextStep: "remove_setup_token" }
-    );
-  } catch (error) {
-    console.error(
-      "Account bootstrap failed:",
-      error instanceof Error ? error.message : "Unknown setup error"
-    );
-    return json(
-      "Setup belum selesai. Periksa migration Supabase 001 sampai 004, lalu ulangi proses. Password akun yang sudah berhasil dibuat tidak diubah saat diulang.",
-      500,
-      { accounts: completed }
+      "Tidak dapat menghubungi Supabase Edge Function. Periksa status bootstrap-accounts di Supabase.",
+      502
     );
   }
 }
