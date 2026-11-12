@@ -184,3 +184,13 @@
  .setupEnvCopy code{font-size:8px}
  .setupEnvState{margin-top:2px}
 }
+
+
+/* In-browser one-time setup token generator */
+.setupTokenGenerator{display:grid;gap:10px;margin-top:12px;padding:12px;border:1px solid #e6ddc7;border-radius:9px;background:#fffdf8}
+.setupTokenGenerator>b,.setupTokenGenerator>div>b{display:block;color:#745a2a;font-size:10px}
+.setupTokenGenerator p{margin:5px 0 0;color:#8c7449;font-size:9px;line-height:1.6}
+.setupTokenGenerator p code{font-size:8px;overflow-wrap:anywhere}
+.setupGeneratedToken{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px}
+.setupGeneratedToken>code{display:block;min-width:0;padding:9px;border:1px solid #eadfca;border-radius:7px;background:#fff;color:#4f442e;font:800 10px ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere;user-select:all}
+.setupGeneratedToken .setupRefresh{margin-top:0;white-space:nowrap}
