@@ -25,7 +25,7 @@ uvicorn app.main:app --host 127.0.0.1 --port 8765
 Simulation mode is enabled by default and creates a synthetic placeholder, not a specimen.
 
 ## Supabase
-Run `supabase/migrations/001_initial_schema.sql`, `002_username_accounts.sql`, `003_role_scoped_access.sql`, and `004_initial_accounts_and_single_admin.sql` in Supabase SQL Editor before initializing user accounts. Migration 003 limits each lab user to examinations they created; admins/reviewers retain review access. Review security policies before enabling real users. Do not store patient identifiers in this prototype.
+All 12 migrations in `supabase/migrations/` are applied to the connected Supabase project. For a fresh project, apply `001` through `012` in numeric order. Migrations 005–006 add AI registry/private storage; 007–008 move role lookup into a private schema and rebuild RLS; 009–012 register one-time bootstrap and dataset governance. Migration 003 limits each lab user to examinations they created; admins/reviewers retain review access. Review security policies before enabling real users. Do not store patient identifiers in this prototype.
 
 **ALL SYSTEM PROVIDE BY INUU**
 
@@ -36,7 +36,7 @@ The first dashboard accounts are provisioned as:
 - `avi_lab` — laboratory user (database role `atlm`, display name `Avi_Lab`)
 - `riska_lab` — laboratory user (database role `atlm`, display name `Riska_lab`)
 
-No default passwords are committed. Run all four migrations `001_initial_schema.sql`, `002_username_accounts.sql`, `003_role_scoped_access.sql`, and `004_initial_accounts_and_single_admin.sql` in Supabase SQL Editor. The fourth migration retires the old starter IDs and ensures only Inuu retains the admin role.
+No default passwords are committed. All 12 migrations `001`–`012` are applied in the connected project. For another project, run the files in numeric order. Migration 004 retires the old starter IDs and ensures only Inuu retains the admin role; later migrations add security hardening, model registry, private storage, bootstrap guard, and external dataset registry.
 
 Configure these three Vercel Project → Settings → Environment Variables for Production and Preview:
 - `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL.
@@ -57,4 +57,4 @@ ID login uses internal aliases in the reserved `.invalid` domain and Supabase Au
 - `services/ai/train_clinical_baseline.py`: exploratory tabular baseline after manually verifying a Kaggle CSV, its target column, source licence, provenance and label quality.
 - `services/ai/DATA-SOURCES.md`: source register for Kaggle, WHO and Kemenkes and their correct roles.
 
-WHO/Kemenkes publications are reference material, not labelled patient datasets. The Kaggle candidate is tabular and cannot train the image classifier. A guarded weekly local training job is available at `services/ai/auto_train.py`; it requires a dataset hash approved by an ATLM and produces a candidate only. It never replaces the active model automatically. All AI outputs remain research-only and require professional review.
+WHO/Kemenkes publications are reference material, not labelled patient datasets. The Kaggle candidate is tabular and cannot train the image classifier. Two public binary agglutination datasets (Blood Agglutination Curated V1 and BloodyWell) are catalogued only as external blood-group morphology benchmarks, not Widal grade datasets. A guarded weekly local training job is available at `services/ai/auto_train.py`; it requires a dataset hash approved by an ATLM and produces a candidate only. It never replaces the active model automatically. All AI outputs remain research-only and require professional review.
