@@ -51,11 +51,11 @@ export async function POST(request: NextRequest) {
   const expectedToken = process.env.BOOTSTRAP_SETUP_TOKEN;
   const supabaseUrl =
     process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceRoleKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!expectedToken || expectedToken.length < 32 || !supabaseUrl || !serviceRoleKey) {
     return json(
-      "Setup belum siap. Admin perlu mengisi NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, SUPABASE_SERVICE_ROLE_KEY, dan BOOTSTRAP_SETUP_TOKEN di Vercel Environment Variables.",
+      "Setup belum siap. Admin perlu mengisi NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY (atau legacy SUPABASE_SERVICE_ROLE_KEY), dan BOOTSTRAP_SETUP_TOKEN di Vercel Environment Variables.",
       503
     );
   }
