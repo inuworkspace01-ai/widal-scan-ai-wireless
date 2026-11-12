@@ -1,0 +1,3 @@
+# Implementation notes
+
+This is a starter prototype, not a clinically validated medical device. Bridge simulation is enabled by default. Real wireless provisioning, device authentication, robust camera reconnection, Supabase application integration, user bootstrap, admin role assignment, audit insertion, and clinical image classification remain future work. Validate all hardware and software on de-identified test specimens only under appropriate ATLM supervision.
