@@ -11,3 +11,6 @@ services/ai/data/raw/
 services/ai/data/crops/
 services/ai/artifacts/
 services/ai/clinical-artifacts/
+services/ai/external-data/
+services/ai/benchmark-data/
+services/ai/downloads/
