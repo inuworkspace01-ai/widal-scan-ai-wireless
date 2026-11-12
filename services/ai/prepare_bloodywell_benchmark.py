@@ -10,17 +10,17 @@ import pandas as pd
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Convert the public BloodyWell metadata into a separate binary "
-            "agglutination benchmark manifest. This is NOT a Widal dataset."
+            "Create a metadata manifest for the public BloodyWell test subset. "
+            "This is an external ABO/Rh/Kell benchmark, NOT Widal training data."
         )
     )
     parser.add_argument("--markup", required=True, type=Path, help="Path to BloodyWell test_markup.json")
-    parser.add_argument("--image-root", required=True, type=Path, help="Directory containing the downloaded PNG files")
+    parser.add_argument("--image-root", required=True, type=Path, help="Directory containing downloaded PNG files")
     parser.add_argument("--out", type=Path, default=Path("bloodywell_external_benchmark.csv"))
     parser.add_argument(
         "--allow-missing-images",
         action="store_true",
-        help="Write manifest rows even if image files are not present yet.",
+        help="Write metadata-only rows when files are absent. Such rows cannot be used for training.",
     )
     return parser.parse_args()
 
@@ -51,63 +51,70 @@ def main() -> None:
         if not isinstance(item, dict):
             raise SystemExit(f"Invalid annotation for {filename}")
 
-        gt = item.get("gt_result")
-        if gt not in (0, 1):
-            raise SystemExit(f"Unexpected gt_result for {filename}: {gt!r}")
+        ground_truth = item.get("gt_result")
+        if ground_truth not in (0, 1):
+            raise SystemExit(f"Unexpected gt_result for {filename}: {ground_truth!r}")
 
-        file_path = Path(str(filename))
-        if file_path.name != str(filename) or file_path.is_absolute():
+        image_name = Path(str(filename))
+        if image_name.name != str(filename) or image_name.is_absolute():
             raise SystemExit(f"Unsafe image filename in markup: {filename}")
 
-        prefix = file_path.stem.split("_", 1)[0]
-        if not prefix.isdigit():
-            raise SystemExit(f"Could not derive sample group from filename: {filename}")
-
-        resolved_image = (image_root / file_path.name).resolve()
-        if image_root not in resolved_image.parents:
+        image_path = (image_root / image_name.name).resolve()
+        if image_root not in image_path.parents:
             raise SystemExit(f"Image path escapes image root: {filename}")
-        exists = resolved_image.is_file()
+
+        exists = image_path.is_file()
         if not exists:
             missing.append(str(filename))
             if not args.allow_missing_images:
                 continue
 
         rows.append({
-            "image_path": str(file_path.name),
-            "sample_group_id": prefix,
+            "image_path": image_name.name,
             "reagent": str(item.get("reagent", "")),
-            "source_row_idx": item.get("row_idx"),
-            "source_col_idx": item.get("col_idx"),
-            "binary_agglutination_gt": int(gt),
+            "plate_row_idx": item.get("row_idx"),
+            "plate_col_idx": item.get("col_idx"),
+            "binary_agglutination_gt": int(ground_truth),
             "task": "external_agglutination_binary",
             "source_dataset": "BloodyWell",
             "image_exists": exists,
+            "specimen_group_id": "",
+            "grouping_verified": False,
             "not_widal": True,
         })
 
-    if not rows:
+    if missing and not args.allow_missing_images:
+        sample = ", ".join(missing[:10])
         raise SystemExit(
-            "No image rows were written. Place the 529-image public test subset "
-            "in --image-root or use --allow-missing-images to create a metadata-only manifest."
+            f"{len(missing)} referenced images are missing (examples: {sample}). "
+            "No manifest was written. Restore the complete 529-image subset or use "
+            "--allow-missing-images for a metadata-only catalogue."
         )
 
-    result = pd.DataFrame(rows).sort_values(["sample_group_id", "source_col_idx", "image_path"])
+    if not rows:
+        raise SystemExit("No metadata rows were written.")
+
+    result = pd.DataFrame(rows).sort_values(
+        ["plate_row_idx", "plate_col_idx", "image_path"],
+        kind="stable",
+    )
     out_path.parent.mkdir(parents=True, exist_ok=True)
     result.to_csv(out_path, index=False)
 
     summary = {
         "manifest": str(out_path),
         "rows_written": int(len(result)),
-        "unique_sample_groups": int(result["sample_group_id"].nunique()),
-        "missing_images": len(missing),
-        "label_counts": {
+        "images_present": int(result["image_exists"].sum()),
+        "images_missing": len(missing),
+        "binary_label_counts": {
             str(label): int(count)
             for label, count in result["binary_agglutination_gt"].value_counts().sort_index().items()
         },
         "task": "external_agglutination_binary",
+        "specimen_grouping": "not verified from the published public markup",
         "warning": (
-            "This is a blood-grouping ABO/Rh/Kell agglutination benchmark. "
-            "It must never be used as Widal 0/1+/2+/3+/4+ labels."
+            "ABO/Rh/Kell blood-grouping benchmark only. Do not train or evaluate "
+            "Widal 0/1+/2+/3+/4+ classification with these labels."
         ),
     }
     print(json.dumps(summary, indent=2))
