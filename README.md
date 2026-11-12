@@ -25,7 +25,7 @@ uvicorn app.main:app --host 127.0.0.1 --port 8765
 Simulation mode is enabled by default and creates a synthetic placeholder, not a specimen.
 
 ## Supabase
-Run `supabase/migrations/001_initial_schema.sql` and `002_username_accounts.sql` in Supabase SQL Editor before initializing user accounts. Review security policies before enabling real users. Do not store patient identifiers in this prototype.
+Run `supabase/migrations/001_initial_schema.sql`, `002_username_accounts.sql`, and `003_role_scoped_access.sql` in Supabase SQL Editor before initializing user accounts. Migration 003 limits each lab user to examinations they created; admins/reviewers retain review access. Review security policies before enabling real users. Do not store patient identifiers in this prototype.
 
 **ALL SYSTEM PROVIDE BY INUU**
 
@@ -36,7 +36,7 @@ The first dashboard accounts are provisioned as:
 - `inu` — super admin (database role `admin`)
 - `lab` — laboratory user (database role `atlm`)
 
-No default passwords are committed. Create a Supabase project and run migrations `001_initial_schema.sql` and `002_username_accounts.sql` in Supabase SQL Editor.
+No default passwords are committed. Create a Supabase project and run migrations `001_initial_schema.sql`, `002_username_accounts.sql`, and `003_role_scoped_access.sql` in Supabase SQL Editor.
 
 Configure Vercel Project → Settings → Environment Variables:
 - `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL.
