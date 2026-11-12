@@ -35,24 +35,6 @@ function json(message: string, status: number, extra: Record<string, unknown> = 
   );
 }
 
-async function findAuthUser(
-  supabase: ReturnType<typeof createClient>,
-  email: string
-): Promise<User | null> {
-  for (let page = 1; page <= 10; page += 1) {
-    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 1000 });
-    if (error) throw error;
-
-    const found = data.users.find(
-      (user) => user.email?.toLowerCase() === email.toLowerCase()
-    );
-    if (found) return found;
-    if (data.users.length < 1000) return null;
-  }
-
-  throw new Error("Account lookup exceeded the supported page range.");
-}
-
 export async function POST(request: NextRequest) {
   const origin = request.headers.get("origin");
   const host = request.headers.get("host");
@@ -123,6 +105,24 @@ export async function POST(request: NextRequest) {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
+  async function findAuthUser(email: string): Promise<User | null> {
+    for (let page = 1; page <= 10; page += 1) {
+      const { data, error } = await supabase.auth.admin.listUsers({
+        page,
+        perPage: 1000,
+      });
+      if (error) throw error;
+
+      const found = data.users.find(
+        (user) => user.email?.toLowerCase() === email.toLowerCase()
+      );
+      if (found) return found;
+      if (data.users.length < 1000) return null;
+    }
+
+    throw new Error("Account lookup exceeded the supported page range.");
+  }
+
   const completed: string[] = [];
 
   try {
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
     for (let index = 0; index < ACCOUNT_DEFINITIONS.length; index += 1) {
       const account = ACCOUNT_DEFINITIONS[index];
       const email = account.username + "@login.widal-scan.invalid";
-      let user = await findAuthUser(supabase, email);
+      let user = await findAuthUser(email);
 
       if (!user) {
         const { data, error } = await supabase.auth.admin.createUser({
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
         if (error) {
           // Handle a simultaneous first-time setup attempt without changing
           // an existing account password.
-          user = await findAuthUser(supabase, email);
+          user = await findAuthUser(email);
           if (!user) throw error;
         } else {
           user = data.user;
