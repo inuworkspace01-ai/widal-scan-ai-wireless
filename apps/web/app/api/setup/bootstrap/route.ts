@@ -7,8 +7,8 @@ export const dynamic = "force-dynamic";
 
 const ACCOUNT_DEFINITIONS = [
   { username: "inuu", displayName: "Inuu", role: "admin" as const },
-  { username: "inu", displayName: "Inu", role: "admin" as const },
-  { username: "lab", displayName: "Laboratorium", role: "atlm" as const },
+  { username: "avi_lab", displayName: "Avi_Lab", role: "atlm" as const },
+  { username: "riska_lab", displayName: "Riska_lab", role: "atlm" as const },
 ];
 
 type SetupBody = {
@@ -165,6 +165,12 @@ export async function POST(request: NextRequest) {
         } else {
           user = data.user;
         }
+      } else {
+        const { error: passwordError } = await supabase.auth.admin.updateUserById(
+          user.id,
+          { password: passwords[index] }
+        );
+        if (passwordError) throw passwordError;
       }
 
       const { error: profileError } = await supabase
@@ -195,7 +201,7 @@ export async function POST(request: NextRequest) {
       error instanceof Error ? error.message : "Unknown setup error"
     );
     return json(
-      "Setup belum selesai. Periksa migration Supabase 001 dan 002, lalu ulangi proses. Password akun yang sudah berhasil dibuat tidak diubah saat diulang.",
+      "Setup belum selesai. Periksa migration Supabase 001 sampai 004, lalu ulangi proses. Password akun yang sudah berhasil dibuat tidak diubah saat diulang.",
       500,
       { accounts: completed }
     );
