@@ -119,8 +119,8 @@ export default function Home() {
     event.preventDefault();
     setAuthError("");
     const username = loginId.trim().toLowerCase();
-    if (!["inuu", "inu", "lab"].includes(username)) {
-      setAuthError("ID yang terdaftar: inuu, inu, atau lab.");
+    if (!["inuu", "avi_lab", "riska_lab"].includes(username)) {
+      setAuthError("ID yang terdaftar: Inuu, Avi_Lab, atau Riska_lab.");
       return;
     }
     if (!loginPassword) {
@@ -261,7 +261,7 @@ export default function Home() {
             <p className="loginSubtitle">Gunakan ID akun yang sudah didaftarkan oleh administrator.</p>
             <form onSubmit={handleLogin} className="loginForm">
               <label>ID Pengguna
-                <input value={loginId} onChange={(event) => setLoginId(event.target.value)} placeholder="Contoh: lab" autoComplete="username" required/>
+                <input value={loginId} onChange={(event) => setLoginId(event.target.value)} placeholder="Contoh: Avi_Lab" autoComplete="username" required/>
               </label>
               <label>Password
                 <div className="passwordField">
@@ -275,7 +275,7 @@ export default function Home() {
             </form>
             <div className="accountHints">
               <span>AKUN YANG DISIAPKAN</span>
-              <div><code>inuu</code><small>Super Admin</small><code>inu</code><small>Super Admin</small><code>lab</code><small>Lab User</small></div>
+              <div><code>Inuu</code><small>Super Admin</small><code>Avi_Lab</code><small>Lab User</small><code>Riska_lab</code><small>Lab User</small></div>
             </div>
             <Link href="/setup" className="firstSetupLink">Pertama kali menggunakan aplikasi? <b>Siapkan akun awal <ArrowUpRight size={13}/></b></Link>
             <div className="loginFooter">WIDAL-SCAN AI · ALL SYSTEM PROVIDE BY INUU</div>
@@ -347,7 +347,7 @@ export default function Home() {
             <div className="notice"><b>Prinsip penting:</b> WHO/Kemenkes menyediakan pedoman, bukan label gambar. Dataset Kaggle tabular hanya kandidat setelah lisensi dan kualitas label diperiksa. Foto Widal untuk computer vision harus dikumpulkan dengan setup alat ini dan diberi label ATLM.</div>
           </div>}
 
-          {tab === "accounts" && isAdmin && <div className="panel"><div className="sectionIntro"><div><span className="eyebrow">ACCESS CONTROL</span><h2>Account access</h2><p>Daftar ID awal dan hak akses yang diminta.</p></div><span className="statusTag success">ROLE MAPPED</span></div><div className="accountRow"><div className="userAvatar">I</div><div><b>inuu</b><small>Super Admin · full dashboard access</small></div><span className="roleBadge admin">SUPER ADMIN</span></div><div className="accountRow"><div className="userAvatar">I</div><div><b>inu</b><small>Super Admin · full dashboard access</small></div><span className="roleBadge admin">SUPER ADMIN</span></div><div className="accountRow"><div className="userAvatar">L</div><div><b>lab</b><small>Lab User · capture and examination workspace</small></div><span className="roleBadge lab">LAB USER</span></div><div className="notice">Password tiap akun dibuat saat bootstrap melalui environment rahasia. Tidak ada password default di source code. Akun baru belum aktif sampai migration dan script bootstrap dijalankan di project Supabase.</div></div>}
+          {tab === "accounts" && isAdmin && <div className="panel"><div className="sectionIntro"><div><span className="eyebrow">ACCESS CONTROL</span><h2>Account access</h2><p>Daftar ID awal dan hak akses yang diminta.</p></div><span className="statusTag success">ROLE MAPPED</span></div><div className="accountRow"><div className="userAvatar">I</div><div><b>Inuu</b><small>Super Admin · full dashboard access</small></div><span className="roleBadge admin">SUPER ADMIN</span></div><div className="accountRow"><div className="userAvatar">A</div><div><b>Avi_Lab</b><small>Lab User · capture and examination workspace</small></div><span className="roleBadge lab">LAB USER</span></div><div className="accountRow"><div className="userAvatar">R</div><div><b>Riska_lab</b><small>Lab User · capture and examination workspace</small></div><span className="roleBadge lab">LAB USER</span></div><div className="notice">Password tiap akun dibuat saat setup awal melalui wizard. Tidak ada password default di source code. Pengguna lab hanya dapat membaca dan mengubah pemeriksaan miliknya sendiri.</div></div>}
 
           {tab === "history" && <div className="panel"><h3>Examination history</h3><p>Riwayat tersimpan di Supabase setelah konfigurasi project dan tabel selesai. Saat ini belum ada data pemeriksaan.</p><div className="empty"><ImageIcon size={32}/><b>No examinations yet</b><small>Data demo tidak dihitung sebagai hasil pemeriksaan.</small></div></div>}
 
