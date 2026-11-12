@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import Link from "next/link";
 import {
   Activity, Camera, Wifi, WifiOff, Settings, Image as ImageIcon,
   ShieldCheck, RefreshCw, LogOut, BrainCircuit, Database, Users,
@@ -276,6 +277,7 @@ export default function Home() {
               <span>AKUN YANG DISIAPKAN</span>
               <div><code>inuu</code><small>Super Admin</small><code>inu</code><small>Super Admin</small><code>lab</code><small>Lab User</small></div>
             </div>
+            <Link href="/setup" className="firstSetupLink">Pertama kali menggunakan aplikasi? <b>Siapkan akun awal <ArrowUpRight size={13}/></b></Link>
             <div className="loginFooter">WIDAL-SCAN AI · ALL SYSTEM PROVIDE BY INUU</div>
           </div>
         </section>
