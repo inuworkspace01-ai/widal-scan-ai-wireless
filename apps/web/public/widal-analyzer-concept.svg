@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 620" role="img" aria-labelledby="title desc">
+<title id="title">WIDAL-SCAN Automated Analyzer concept schematic</title>
+<desc id="desc">Vector concept illustration of a benchtop analyzer with serum input, separate O and H reagent bays, robotic liquid handling, reaction rack, optical camera and touchscreen. This is a design concept, not a production machine.</desc>
+<defs>
+  <linearGradient id="shell" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d9e4ed"/></linearGradient>
+  <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9f5ff" stop-opacity=".72"/><stop offset="1" stop-color="#133d5c" stop-opacity=".88"/></linearGradient>
+  <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#163b5b"/><stop offset="1" stop-color="#061a2d"/></linearGradient>
+  <linearGradient id="base" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0d263c"/><stop offset="1" stop-color="#16435a"/></linearGradient>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feGaussianBlur stdDeviation="18"/></filter>
+</defs>
+<ellipse cx="660" cy="540" rx="510" ry="38" fill="#17364d" opacity=".16" filter="url(#shadow)"/>
+<g transform="translate(75 25)">
+  <path d="M95 120 Q95 75 145 65 L980 65 Q1040 65 1050 120 L1085 410 Q1090 445 1050 460 L120 460 Q78 455 80 415Z" fill="url(#shell)" stroke="#9aaebc" stroke-width="3"/>
+  <path d="M110 422 L1060 422 L1050 468 Q1048 485 1025 485 L150 485 Q125 485 120 466Z" fill="url(#base)"/>
+  <rect x="135" y="105" width="610" height="292" rx="26" fill="#142f48" stroke="#7991a5" stroke-width="6"/>
+  <rect x="151" y="120" width="579" height="263" rx="18" fill="url(#glass)" stroke="#9ed4e6" stroke-width="2"/>
+  <path d="M165 133 H705" stroke="#d8f8ff" stroke-opacity=".52" stroke-width="3"/>
+  <rect x="166" y="145" width="150" height="216" rx="10" fill="#0e263a" opacity=".56"/>
+  <g transform="translate(185 162)">
+    <rect width="55" height="120" rx="10" fill="#f6a324" stroke="#fff" stroke-opacity=".6" stroke-width="2"/>
+    <rect x="8" y="20" width="39" height="85" rx="5" fill="#f8d9a0" opacity=".85"/>
+    <rect x="67" width="55" height="120" rx="10" fill="#18a6b5" stroke="#fff" stroke-opacity=".6" stroke-width="2"/>
+    <rect x="75" y="20" width="39" height="85" rx="5" fill="#9ce8e8" opacity=".9"/>
+    <rect x="5" y="-7" width="45" height="15" rx="4" fill="#2d4c68"/>
+    <rect x="72" y="-7" width="45" height="15" rx="4" fill="#2d4c68"/>
+    <text x="27" y="145" font-family="Arial" font-size="12" fill="#edf9ff" text-anchor="middle">ANTIGEN O</text>
+    <text x="94" y="145" font-family="Arial" font-size="12" fill="#edf9ff" text-anchor="middle">ANTIGEN H</text>
+  </g>
+  <rect x="360" y="310" width="322" height="34" rx="7" fill="#183d59" stroke="#b4d4de" stroke-width="2"/>
+  <g transform="translate(375 272)">
+    <path d="M15 0 H286" stroke="#a7c9d5" stroke-width="8" stroke-linecap="round"/>
+    <g fill="#eaf8fc" stroke="#7898aa" stroke-width="2">
+      <rect x="10" y="15" width="26" height="72" rx="6"/><rect x="49" y="15" width="26" height="72" rx="6"/><rect x="88" y="15" width="26" height="72" rx="6"/><rect x="127" y="15" width="26" height="72" rx="6"/><rect x="166" y="15" width="26" height="72" rx="6"/><rect x="205" y="15" width="26" height="72" rx="6"/><rect x="244" y="15" width="26" height="72" rx="6"/>
+    </g>
+    <g fill="#56bbc5" opacity=".55"><path d="M12 58h22v27H12z"/><path d="M51 58h22v27H51z"/><path d="M90 58h22v27H90z"/><path d="M129 58h22v27H129z"/><path d="M168 58h22v27h-22z"/><path d="M207 58h22v27h-22z"/><path d="M246 58h22v27h-22z"/></g>
+  </g>
+  <path d="M410 145 V196 H584 V145" fill="none" stroke="#9fc7d4" stroke-width="13" stroke-linecap="round" opacity=".75"/>
+  <rect x="470" y="125" width="58" height="72" rx="9" fill="#e7f1f6" stroke="#7190a4" stroke-width="2"/>
+  <path d="M500 197 V260" stroke="#c5d9e3" stroke-width="11" stroke-linecap="round"/>
+  <path d="M500 259 L493 279 L507 279Z" fill="#f2f7f9" stroke="#5f8299" stroke-width="2"/>
+  <g transform="translate(785 120)">
+    <rect x="0" y="0" width="220" height="225" rx="18" fill="#eaf1f5" stroke="#9db0bd" stroke-width="3"/>
+    <rect x="16" y="16" width="188" height="150" rx="12" fill="url(#screen)"/>
+    <circle cx="61" cy="66" r="21" fill="#9ddfe8" opacity=".9"/><circle cx="61" cy="66" r="9" fill="#2b7188"/>
+    <path d="M102 48 H183 M102 64 H173 M102 80 H165" stroke="#9ed9e6" stroke-width="5" stroke-linecap="round"/>
+    <path d="M32 134 L58 120 L83 129 L108 105 L133 114 L160 92 L186 102" fill="none" stroke="#38cfce" stroke-width="4"/>
+    <rect x="24" y="181" width="172" height="24" rx="12" fill="#dce7ec"/>
+    <circle cx="66" cy="193" r="7" fill="#15a69b"/><circle cx="110" cy="193" r="7" fill="#e2a03b"/><circle cx="154" cy="193" r="7" fill="#4e7e98"/>
+  </g>
+  <rect x="162" y="385" width="150" height="22" rx="7" fill="#a8bbc7"/>
+  <rect x="176" y="350" width="122" height="38" rx="8" fill="#d7e5eb" stroke="#92a9b8" stroke-width="2"/>
+  <path d="M195 369 H279" stroke="#91a6b3" stroke-width="4" stroke-linecap="round"/>
+  <rect x="360" y="435" width="370" height="9" rx="4" fill="#18b6c1"/>
+  <rect x="820" y="435" width="145" height="9" rx="4" fill="#18b6c1"/>
+  <circle cx="1040" cy="175" r="23" fill="#d8e4eb" stroke="#93a9b9" stroke-width="3"/><circle cx="1040" cy="175" r="11" fill="#de4848"/>
+  <g font-family="Arial,sans-serif" fill="#eaf8fc">
+    <text x="120" y="510" font-size="18" font-weight="700">WIDAL-SCAN AUTO ANALYZER</text>
+    <text x="120" y="532" font-size="12" opacity=".72">CONCEPT ONLY · CLOSED REACTION BAY · CAMERA + LIQUID HANDLING</text>
+  </g>
+</g>
+</svg>

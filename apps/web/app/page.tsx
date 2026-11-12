@@ -95,6 +95,7 @@ export default function Home() {
   const [capture, setCapture] = useState<Capture | null>(null);
   const [preview, setPreview] = useState("");
   const [message, setMessage] = useState("Bridge belum diperiksa.");
+  const [analyzerSimulation, setAnalyzerSimulation] = useState(false);
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -237,6 +238,7 @@ export default function Home() {
   const nav = [
     { id: "overview", label: "Overview", icon: Activity },
     { id: "capture", label: "Capture", icon: Camera },
+    { id: "analyzer", label: "Auto Analyzer", icon: FlaskConical },
     ...(isAdmin ? [
       { id: "device", label: "Device & Wi-Fi", icon: Wifi },
       { id: "models", label: "AI / Machine Learning", icon: BrainCircuit },
@@ -344,6 +346,63 @@ export default function Home() {
           {tab === "capture" && <div className="grid2 captureLayout">
             <div className="panel"><h3>Camera preview</h3><div className="preview">{preview ? <img src={preview} alt="Captured preview"/> : <div><Camera size={42}/><b>Camera preview</b><span>Tekan Take Picture untuk meminta gambar dari Windows Bridge.</span></div>}</div><div className="actions"><button className="primary" disabled={busy} onClick={() => void takePicture()}>{busy ? "Processing..." : "Take Picture"}</button><button className="secondary" onClick={() => {setPreview("");setCapture(null);}}>Clear preview</button></div>{capture?.simulation && <div className="notice">SIMULATION IMAGE — bukan citra pemeriksaan Widal.</div>}</div>
             <div className="panel"><h3>Capture information</h3><div className="infoRow"><span>Capture ID</span><b>{capture?.captureId || "—"}</b></div><div className="infoRow"><span>Status</span><b>{capture?.status || "Waiting"}</b></div><div className="infoRow"><span>Bridge</span><b>{bridge?.ok ? "Online" : "Offline"}</b></div><p>{message}</p><div className="notice">Hasil pembacaan visual bersifat eksperimental dan wajib diverifikasi ATLM. Aplikasi ini bukan alat diagnosis demam tifoid.</div></div>
+          </div>}
+
+          {tab === "analyzer" && <div className="stack">
+            <div className="analyzerHero">
+              <div className="analyzerHeroCopy">
+                <span className="eyebrow light">HARDWARE CONCEPT · WIRELESS IOT</span>
+                <h2>Automated Widal Analyzer</h2>
+                <p>Konsep alat meja untuk menyiapkan seri pengenceran serum, memisahkan jalur antigen O dan H, melakukan pencampuran sesuai IFU, menginkubasi, lalu mengambil citra reaksi dengan kamera ber-pencahayaan tetap.</p>
+                <div className="analyzerPills"><span>CONCEPT REV 0.1</span><span>LOCAL WI-FI BRIDGE</span><span>NOT CLINICALLY VALIDATED</span></div>
+              </div>
+              <div className="analyzerHeroVisual"><img src="/widal-analyzer-concept.svg" alt="Ilustrasi konsep alat WIDAL-SCAN automated analyzer"/></div>
+            </div>
+
+            <div className="notice analyzerNotice"><b>Catatan spesimen:</b> Widal mereaksikan <b>serum</b> pasien dengan antigen, bukan darah utuh langsung. Versi awal alat menerima serum yang sudah dipisahkan. Jika ingin memasukkan tabung darah utuh, diperlukan tahap pembekuan dan sentrifugasi tervalidasi sebagai modul terpisah. <a href="https://tulipgroup.com/PDFs/Serology/IFU/VITAL-WIDAL-IFU.pdf" target="_blank" rel="noreferrer">Contoh IFU kit Widal <ArrowUpRight size={13}/></a></div>
+
+            <div className="analyzerGrid">
+              <div className="panel analyzerPanel">
+                <div className="panelHead"><div><span className="eyebrow">PROPOSED HARDWARE</span><h3>Susunan modul alat</h3><p>Modul dibuat tertutup agar cairan dan area optik terlindungi.</p></div><span className="statusTag research">DESIGN ONLY</span></div>
+                <div className="hardwareList">
+                  <div><span>01</span><div><b>Serum inlet & barcode</b><small>Rak tabung serum, barcode/QR, sensor posisi. Input awal berupa serum jernih yang sudah dipisahkan.</small></div></div>
+                  <div><span>02</span><div><b>Liquid handling</b><small>Pompa syringe presisi, pipet bermotor, tip sekali pakai, reservoir NaCl 0,85%, dan sensor level/ujung cairan.</small></div></div>
+                  <div><span>03</span><div><b>Separate O / H reagent bays</b><small>Tempat antigen O dan H terpisah, jalur dispensing teridentifikasi, serta kontrol lot dan kedaluwarsa.</small></div></div>
+                  <div><span>04</span><div><b>Dilution & reaction rack</b><small>Rak tabung atau microplate berindeks untuk pengenceran seri dua kali lipat; posisi kontrol negatif dan positif ikut dicatat.</small></div></div>
+                  <div><span>05</span><div><b>Mixing & incubation</b><small>Pengaduk dengan kecepatan terukur dan ruang inkubasi dengan sensor suhu. Parameter wajib mengikuti IFU kit, bukan preset universal.</small></div></div>
+                  <div><span>06</span><div><b>Optical reader</b><small>Kamera makro/USB, fokus terkunci, LED difus, latar kontras, dan dudukan yang mengulang posisi tabung.</small></div></div>
+                  <div><span>07</span><div><b>Controller & safety</b><small>ESP32-S3/STM32 untuk motor dan sensor, PC Windows sebagai host AI, interlock pintu, emergency stop, deteksi bocor, dan wadah limbah tertutup.</small></div></div>
+                </div>
+              </div>
+              <div className="panel analyzerPanel">
+                <div className="panelHead"><div><span className="eyebrow">PROPOSED WORKFLOW</span><h3>Alur proses otomatis</h3><p>Simulasi layar saja — belum menggerakkan hardware.</p></div><span className="statusTag pending">DEVICE OFFLINE</span></div>
+                <div className="analyzerSteps">
+                  <div><i>01</i><div><b>Register sample</b><small>Scan ID serum dan pilih lot kit / IFU yang berlaku.</small></div></div>
+                  <div><i>02</i><div><b>Aliquot serum</b><small>Ambil volume terukur dengan tip baru untuk setiap spesimen.</small></div></div>
+                  <div><i>03</i><div><b>Serial dilution</b><small>Campur serum + saline dan transfer berurutan; jalur O dan H tetap terpisah.</small></div></div>
+                  <div><i>04</i><div><b>Add O / H antigens</b><small>Tambahkan suspensi antigen terpisah dan mix sesuai petunjuk kit.</small></div></div>
+                  <div><i>05</i><div><b>Incubate</b><small>Jalankan suhu dan waktu sesuai IFU; jangan gunakan satu resep untuk semua kit.</small></div></div>
+                  <div><i>06</i><div><b>Capture & ATLM review</b><small>Ambil foto konsisten, tampilkan indikator visual/titer kandidat, lalu verifikasi ATLM.</small></div></div>
+                </div>
+                <div className="analyzerDilution"><b>Contoh pengenceran dua kali lipat</b><div>1:80 <span>→</span> 1:160 <span>→</span> 1:320 <span>→</span> 1:640 <span>→</span> 1:1280</div><small>Contoh rentang saja. Titik awal, volume, urutan, suhu dan waktu harus diambil dari IFU kit yang dipakai.</small></div>
+              </div>
+            </div>
+
+            <div className="analyzerGrid analyzerGridBottom">
+              <div className="panel analyzerPanel">
+                <div className="panelHead"><div><span className="eyebrow">LOCAL CONTROLLER</span><h3>Koneksi aplikasi</h3><p>Dashboard ↔ Windows Bridge ↔ controller alat di LAN.</p></div><span className={"statusTag " + (bridge?.ok ? "success" : "pending")}>{bridge?.ok ? "BRIDGE ONLINE" : "BRIDGE OFFLINE"}</span></div>
+                <div className="controllerRoute"><div><b>WIDAL-SCAN app</b><small>Dashboard & hasil review</small></div><span>↔</span><div><b>Windows Bridge</b><small>Python API + device queue</small></div><span>↔</span><div><b>ESP32-S3 / STM32</b><small>Motor, sensor, interlock</small></div></div>
+                <div className="notice">Saat ini aplikasi baru memeriksa Windows Bridge dan mengambil gambar kamera. Endpoint kontrol pompa, motor, shaker, inkubator, serta interlock analyzer belum tersedia. Semua perintah aktuator tetap dikunci.</div>
+                <button className="secondary" onClick={() => void checkBridge()}>Periksa Windows Bridge <RefreshCw size={14}/></button>
+              </div>
+              <div className="panel analyzerPanel analyzerSimulationPanel">
+                <div className="panelHead"><div><span className="eyebrow">UI PREVIEW</span><h3>Simulasi alur alat</h3><p>Tidak mengirim perintah ke motor, pompa, heater atau perangkat fisik.</p></div><span className="statusTag research">SIMULATION</span></div>
+                <div className="simulationReadout"><div><small>RUN STATUS</small><b>{analyzerSimulation ? "SIMULATED COMPLETE" : "IDLE"}</b></div><div><small>DEVICE COMMANDS</small><b>LOCKED</b></div></div>
+                {analyzerSimulation && <div className="simulationDone">Simulasi 6 tahap selesai. Tidak ada sampel atau reagen yang diproses secara fisik.</div>}
+                <div className="actions"><button className="primary" onClick={() => setAnalyzerSimulation(true)}>Simulasikan alur</button><button className="secondary" onClick={() => setAnalyzerSimulation(false)}>Reset</button></div>
+              </div>
+            </div>
+            <div className="notice"><b>Penggunaan:</b> ini adalah konsep rekayasa dan workspace riset. Widal memiliki keterbatasan diagnostik; hasil visual tidak boleh dinyatakan sebagai diagnosis tifoid. Kultur darah tetap menjadi metode utama menurut CDC. <a href="https://www.cdc.gov/typhoid-fever/hcp/clinical-guidance/index.html" target="_blank" rel="noreferrer">Baca panduan CDC <ArrowUpRight size={13}/></a>.</div>
           </div>}
 
           {tab === "device" && isAdmin && <div className="panel formPanel"><h3>Wireless device connection</h3><p>PC Windows dan ESP32-CAM harus berada pada jaringan Wi-Fi lokal 2,4 GHz yang sama.</p><div className="infoRow"><span>Bridge endpoint</span><b>http://127.0.0.1:8765</b></div><div className="infoRow"><span>Current device</span><b>{bridge?.device?.ip || "192.168.50.20 (placeholder)"}</b></div><div className="infoRow"><span>Connection status</span><b>{bridge?.ok ? "Bridge online" : "Bridge offline"}</b></div><div className="notice">Firmware provisioning Wi-Fi yang aman belum diimplementasikan. Jangan mengirim atau menyimpan password Wi-Fi di dashboard sampai mekanisme pairing dan autentikasi perangkat selesai.</div><button className="primary" onClick={() => void checkBridge()}>Check local bridge <RefreshCw size={15}/></button></div>}
