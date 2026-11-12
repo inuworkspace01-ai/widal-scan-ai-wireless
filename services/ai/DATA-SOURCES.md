@@ -23,14 +23,17 @@ The optional `train_clinical_baseline.py` script is a research-only baseline run
 ## 3. Blood Agglutination Curated Dataset V1 (not Widal)
 
 - **DOI:** https://doi.org/10.5281/zenodo.21384197
-- **Dataset Data Card:** https://github.com/sayon-mitra024/blood-agglutination-calibration-framework/blob/main/DATA_CARD.md
-- **Repository:** https://github.com/sayon-mitra024/blood-agglutination-calibration-framework
-- **Declared composition:** 8,043 RGB images resized to 224×224 (6,550 train / 1,030 validation / 463 test); binary clumped / not-clumped labels. The dataset Data Card reports 7,009 clumped and 1,034 not-clumped images, an imbalanced distribution.
-- **Provenance:** curated from Roboflow Universe “Blood Group Detection”. Its Data Card declares deduplication and fixed splits, but no donor/specimen identifier is supplied. A claimed image-level leakage audit does not prove patient-level group separation.
-- **License:** CC BY 4.0 as declared by the dataset Data Card. Preserve attribution and verify the current Zenodo metadata and original Roboflow licence before reuse.
-- **Related third-party model:** https://huggingface.co/sayon-mitra024/blood-agglutination-classifier. Its model card reports macro-F1 0.741 and balanced accuracy 0.766 on its own 463-image test set. These are the third party’s reported binary benchmark results, not independent verification and not WIDAL-SCAN performance.
-- **Use:** external binary agglutination benchmark / exploratory transfer-learning only. Keep the classes `clumped` / `not clumped` separate from Widal reaction grades. Never map the two labels to `0`, `1+`, `2+`, `3+`, or `4+`.
-- **Status:** registered in Supabase as `external_agglutination_binary`, pending provenance/rights review; images have not been downloaded and no model has been trained by WIDAL-SCAN.
+- **Archive citation/repository:** https://github.com/sayon-mitra024/BloodGroupDataset_V1
+- **README attribution:** https://universe.roboflow.com/minor-project-5th-semester/blood-group-detection-4yvdx
+- **Declared composition:** 8,043 JPEG RGB images at 224×224; 6,550 train / 1,030 validation / 463 test; binary `clumped` / `not_clumped`; reported source counts 7,009 and 1,034.
+- **Rights status:** **pending verification**. The uploaded archive's `CITATION.cff` explicitly says `License pending verification of original dataset redistribution terms`; its `DATASET_CARD.md` says the original source is unavailable. Its README points to a Roboflow Universe project that currently displays CC BY 4.0, but the exact derivation and version mapping from that project to the 8,043-image archive are not documented. Do not treat the archive as automatically cleared for reuse or redistribution on the basis of the Roboflow page alone. Obtain written/source-level confirmation from the dataset curator or verify the archive's provenance and licence chain first.
+- **Uploaded archive audit (13 November 2026):** 8,043/8,043 images readable and consistently 224×224 JPEG RGB; 174 exact duplicate groups with same labels (174 redundant copies); 22 exact-image groups assigned conflicting labels (44 files excluded); no exact-byte duplicate across the provided splits. After exact-duplicate handling, 7,825 unique images remain in the candidate manifest.
+- **Possible group leakage:** filenames contain tokens such as `A-14` / `AB-75`. 438 distinct tokens appear in more than one split. The archive does not define these tokens, so they are not treated as verified specimen IDs; their meaning must be confirmed by the curator before any claim of independent test performance. The current manifest is only image-level.
+- **Related third-party model:** https://huggingface.co/sayon-mitra024/blood-agglutination-classifier. Its reported metrics belong to that model author's experiment and are not WIDAL-SCAN results.
+- **Use:** separate external blood-group/agglutination binary benchmark only. Never convert these labels to Widal reaction grades or combine these images with the Widal-specific training partitions.
+- **Status:** registered in Supabase as `external_agglutination_binary`, still `pending_review`; archive audited locally; candidate manifest generated after exact duplicate filtering; model not trained; no performance metrics produced.
+
+See [DATASET-AUDIT.md](DATASET-AUDIT.md) for the audit methodology and counts.
 
 ## 4. Related agglutination image dataset (not Widal)
 
