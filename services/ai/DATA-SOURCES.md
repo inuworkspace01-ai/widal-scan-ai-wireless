@@ -32,7 +32,7 @@ The optional `train_clinical_baseline.py` script is a research-only baseline run
 - **Use:** external binary agglutination benchmark / exploratory transfer-learning only. Keep the classes `clumped` / `not clumped` separate from Widal reaction grades. Never map the two labels to `0`, `1+`, `2+`, `3+`, or `4+`.
 - **Status:** registered in Supabase as `external_agglutination_binary`, pending provenance/rights review; images have not been downloaded and no model has been trained by WIDAL-SCAN.
 
-## 3. Related agglutination image dataset (not Widal)
+## 4. Related agglutination image dataset (not Widal)
 
 - **BloodyWell:** https://zenodo.org/records/14285035
 - **Repository and public test subset:** https://github.com/createcolor/bloody_well
@@ -45,27 +45,27 @@ The optional `train_clinical_baseline.py` script is a research-only baseline run
 
 A separate one-image illustration is available on Wikimedia Commons: https://commons.wikimedia.org/wiki/File:Widal_Test_Slide.jpg. It is licensed CC BY-SA 3.0 and shows a Widal slide with O/H agglutination. This is a single illustrative image without machine-readable per-well grade annotations; use it for reference/demo only, not model training.
 
-## 3. WHO reference material
+## 5. WHO reference material
 
 - **WHO laboratory manual for typhoid and paratyphoid (enteric fever), 2026:** https://www.who.int/publications/b/65402
 - **Use:** laboratory-method reference and study-protocol context; not a labelled training dataset.
 - **Rights:** the WHO publication page lists CC BY-NC-SA 3.0 IGO. Attribute the work and preserve the non-commercial/share-alike conditions when adapting it. Re-check the rights statement before redistribution or commercial use.
 
-## 4. Indonesian Ministry of Health reference
+## 6. Indonesian Ministry of Health reference
 
 - **Kepmenkes RI No. HK.01.07/MENKES/875/2026 — PNPK Tata Laksana Demam Tifoid pada Dewasa:** https://jdih.kemkes.go.id/storage/documents/pdfs/2026kepmenkes875.pdf
 - **Use:** Indonesian clinical-context and governance reference for the adult population. This is a clinical guideline, not a table of labelled training samples. Do not scrape it into pseudo-patient records or train a classifier on recommendation text.
 
-## 5. Additional diagnostic limitation reference
+## 7. Additional diagnostic limitation reference
 
 - **CDC Clinical Guidance for Typhoid Fever and Paratyphoid Fever:** https://www.cdc.gov/typhoid-fever/hcp/clinical-guidance/index.html
 - CDC identifies blood culture as the mainstay of diagnosis and does not recommend Widal serology because of its high false-positive rate. Apply the intended-use and validation limits locally; this international guidance is not a replacement for Indonesian protocols.
 
-## 6. Safety / intended use
+## 8. Safety / intended use
 
 WHO and CDC sources describe limitations of serological diagnosis and the importance of laboratory confirmation. A visual-grade classifier must only report a tentative visual observation for ATLM review. It must not diagnose, rule out, triage, or recommend treatment for typhoid. A good visual grading score does not validate the Widal test as a standalone diagnostic test.
 
-## 7. Data-governance checklist before ingestion
+## 9. Data-governance checklist before ingestion
 
 1. Verify source provenance, licence, allowed purpose, and data dictionary.
 2. Verify what the target label actually means and how it was adjudicated.
