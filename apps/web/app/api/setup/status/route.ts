@@ -12,9 +12,7 @@ const REQUIRED_ENV = [
 
 export async function GET() {
   const presence: Record<string, boolean> = {
-    NEXT_PUBLIC_SUPABASE_URL: Boolean(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-    ),
+    NEXT_PUBLIC_SUPABASE_URL: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: Boolean(
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
