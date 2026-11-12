@@ -101,3 +101,22 @@ The returned score is the model's raw softmax score, **not a calibrated clinical
 - Have an ATLM and clinical/laboratory governance team approve the intended use.
 
 **Important:** good image-grading performance does not make Widal a reliable standalone test for typhoid. CDC does not recommend Widal serology because of false positives; blood culture is the mainstay of diagnosis. This software must not diagnose, rule out, triage, or recommend treatment for typhoid.
+
+
+## Optional clinical tabular research baseline
+
+A separate exploratory runner is available for a locally inspected Kaggle CSV:
+
+```powershell
+python train_clinical_baseline.py --csv data/typhoid.csv --target-column YOUR_LABEL_COLUMN --out-dir clinical-artifacts
+```
+
+When repeated-patient/specimen identifiers exist, pass a verified grouping column:
+
+```powershell
+python train_clinical_baseline.py --csv data/typhoid.csv --target-column YOUR_LABEL_COLUMN --group-column YOUR_PATIENT_GROUP_COLUMN --drop-columns PII_OR_LEAKAGE_COLUMN --out-dir clinical-artifacts
+```
+
+Inspect the CSV schema and licence before running this. The runner excludes common direct identifiers by column-name pattern, but that is not a substitute for manual de-identification and leakage review. Do not feed its class predictions into the Widal image-grade workflow. Outputs are exploratory research only and do not diagnose a patient.
+
+See [DATA-SOURCES.md](DATA-SOURCES.md) for the source register, WHO/Kemenkes reference use, and the data-governance checklist.
