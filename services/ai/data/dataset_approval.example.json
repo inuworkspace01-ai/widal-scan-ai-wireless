@@ -1,0 +1,7 @@
+{
+  "approved": true,
+  "approved_by": "ATLM initials or staff code",
+  "approved_at": "2026-11-12T09:00:00+07:00",
+  "approval_reference": "Internal laboratory review record",
+  "manifest_sha256": "REPLACE_WITH_SHA256_OF_dataset.csv"
+}
