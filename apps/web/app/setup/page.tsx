@@ -4,10 +4,33 @@ import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import {
   Activity, ArrowLeft, CheckCircle2, CircleAlert, KeyRound,
-  LoaderCircle, LockKeyhole, ShieldCheck,
+  LoaderCircle, LockKeyhole, RefreshCw, ShieldCheck,
 } from "lucide-react";
 
-type SetupStatus = { configured: boolean };
+type SetupStatus = {
+  configured: boolean;
+  missing: string[];
+  presence: Record<string, boolean>;
+};
+
+const REQUIRED_ENV = [
+  {
+    key: "NEXT_PUBLIC_SUPABASE_URL",
+    description: "Alamat project Supabase untuk koneksi aplikasi.",
+  },
+  {
+    key: "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+    description: "Kunci publik untuk login dari browser.",
+  },
+  {
+    key: "SUPABASE_SECRET_KEY",
+    description: "Kunci rahasia server untuk membuat akun awal.",
+  },
+  {
+    key: "BOOTSTRAP_SETUP_TOKEN",
+    description: "Token acak minimal 32 karakter untuk mengunci proses setup.",
+  },
+] as const;
 type SetupResponse = {
   ok: boolean;
   message: string;
@@ -17,6 +40,7 @@ type SetupResponse = {
 
 export default function SetupPage() {
   const [status, setStatus] = useState<SetupStatus | null>(null);
+  const [checkingStatus, setCheckingStatus] = useState(false);
   const [token, setToken] = useState("");
   const ACCOUNT_IDS = ["inuu", "avi_lab", "riska_lab"] as const;
   type AccountId = (typeof ACCOUNT_IDS)[number];
@@ -27,13 +51,29 @@ export default function SetupPage() {
   const [result, setResult] = useState<SetupResponse | null>(null);
   const [error, setError] = useState("");
 
+  async function refreshSetupStatus() {
+    setCheckingStatus(true);
+    try {
+      const response = await fetch("/api/setup/status", {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
+      if (!response.ok) throw new Error("Status endpoint unavailable");
+      const data = (await response.json()) as SetupStatus;
+      setStatus(data);
+    } catch {
+      setStatus({
+        configured: false,
+        missing: REQUIRED_ENV.map((item) => item.key),
+        presence: {},
+      });
+    } finally {
+      setCheckingStatus(false);
+    }
+  }
+
   useEffect(() => {
-    let alive = true;
-    fetch("/api/setup/status", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((data: SetupStatus) => { if (alive) setStatus(data); })
-      .catch(() => { if (alive) setStatus({ configured: false }); });
-    return () => { alive = false; };
+    void refreshSetupStatus();
   }, []);
 
   function updatePassword(id: AccountId, value: string) {
@@ -126,23 +166,68 @@ export default function SetupPage() {
           <h2>Konfigurasi akun awal</h2>
           <p className="setupLead">Sebelum mulai, jalankan migration Supabase 001–004 dan tambahkan environment variables di Vercel.</p>
 
-          {status === null ? (
-            <div className="setupStatus"><LoaderCircle size={17}/> Memeriksa konfigurasi server…</div>
-          ) : status.configured ? (
-            <div className="setupStatus ready"><CheckCircle2 size={17}/> Environment server tersedia. Lanjutkan pengisian password.</div>
-          ) : (
-            <div className="setupMissing">
-              <CircleAlert size={18}/>
-              <div><b>Konfigurasi server belum lengkap</b><p>Tambahkan empat variable berikut di Vercel → Project → Settings → Environment Variables, pilih Production dan Preview, lalu redeploy.</p>
-              <code>NEXT_PUBLIC_SUPABASE_URL</code><code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code><code>SUPABASE_SECRET_KEY</code><code>BOOTSTRAP_SETUP_TOKEN</code>
-              <small>Setup token harus berupa string acak minimal 32 karakter. Secret key (sb_secret_) hanya disimpan di server, tidak di browser.</small>
+          <section className="setupConfigPanel" aria-live="polite">
+            <div className="setupConfigHeader">
+              <div>
+                <b>Prasyarat koneksi Supabase & Vercel</b>
+                <p>Nilai rahasia tidak pernah ditampilkan di halaman ini. Yang diperiksa hanya apakah variable sudah tersedia di server.</p>
               </div>
+              {status && (
+                <span className={status.configured ? "setupConfigBadge ready" : "setupConfigBadge missing"}>
+                  {status.configured ? "LENGKAP" : `${status.missing.length} BELUM ADA`}
+                </span>
+              )}
             </div>
-          )}
 
+            {status === null ? (
+              <div className="setupStatus"><LoaderCircle size={17}/> Memeriksa konfigurasi server…</div>
+            ) : (
+              <div className="setupEnvList">
+                {REQUIRED_ENV.map((item) => {
+                  const present = Boolean(status.presence?.[item.key]);
+                  return (
+                    <div className="setupEnvRow" key={item.key}>
+                      <div className="setupEnvCopy">
+                        <code>{item.key}</code>
+                        <small>{item.description}</small>
+                      </div>
+                      <span className={present ? "setupEnvState ready" : "setupEnvState missing"}>
+                        {present ? "TERPASANG" : "BELUM ADA"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {status?.configured ? (
+              <div className="setupStatus ready"><CheckCircle2 size={17}/> Semua variable tersedia. Kamu sudah bisa menyiapkan password akun.</div>
+            ) : (
+              <div className="setupConfigHelp">
+                <b>Langkah konfigurasi</b>
+                <ol>
+                  <li>Buka project <strong>widal-scan-ai-wireless</strong> di Vercel.</li>
+                  <li>Masuk ke <strong>Settings → Environment Variables</strong>.</li>
+                  <li>Tambahkan variable yang berstatus <strong>BELUM ADA</strong> di atas.</li>
+                  <li>Pilih <strong>Production</strong> dan <strong>Preview</strong>, simpan, lalu redeploy.</li>
+                  <li>Kembali ke halaman ini dan tekan <strong>Periksa ulang</strong>.</li>
+                </ol>
+                <a href="https://vercel.com/inuworkspace01-3852/widal-scan-ai-wireless/settings/environment-variables" target="_blank" rel="noreferrer">
+                  Buka Environment Variables Vercel <ArrowLeft size={13}/>
+                </a>
+                <p><strong>Catatan:</strong> menghubungkan Supabase sebagai integrasi tidak selalu memasukkan key ke Environment Variables project Vercel. Pastikan empat variable ini benar-benar ditambahkan pada project yang menjalankan website.</p>
+              </div>
+            )}
+
+            <button type="button" className="setupRefresh" onClick={() => void refreshSetupStatus()} disabled={checkingStatus}>
+              {checkingStatus ? <><LoaderCircle size={15} className="spin"/> Memeriksa…</> : <><RefreshCw size={15}/> Periksa ulang konfigurasi</>}
+            </button>
+          </section>
+
+          {status?.configured ? (
           <form onSubmit={submit} className="setupForm">
             <label className="setupLabel">One-time setup token
-              <input value={token} onChange={(event) => setToken(event.target.value)} type={visible ? "text" : "password"} autoComplete="off" placeholder="Masukkan BOOTSTRAP_SETUP_TOKEN" required/>
+              <input value={token} onChange={(event) => setToken(event.target.value)} type={visible ? "text" : "password"} autoComplete="off" placeholder="Masukkan token setup yang sama dengan BOOTSTRAP_SETUP_TOKEN di Vercel" required/>
             </label>
             <div className="setupFormDivider"><span>AKUN DAN ROLE</span></div>
             {([
@@ -168,6 +253,12 @@ export default function SetupPage() {
               {busy ? <><LoaderCircle size={17} className="spin"/> Menyiapkan akun…</> : <><LockKeyhole size={17}/> Buat 3 akun dan aktifkan login</>}
             </button>
           </form>
+          ) : (
+            <div className="setupFormDisabled">
+              <LockKeyhole size={18}/>
+              <div><b>Form pembuatan akun dikunci sementara</b><p>Kolom token dan password akan muncul setelah seluruh konfigurasi server terpasang. Ini mencegah token dimasukkan ketika endpoint belum siap.</p></div>
+            </div>
+          )}
           <div className="setupFootnote"><ShieldCheck size={15}/> Password tidak ditampilkan kembali, tidak dicatat ke log aplikasi, dan tidak masuk ke GitHub.</div>
         </div>
         <div className="setupPageFooter">WIDAL-SCAN AI · ALL SYSTEM PROVIDE BY INUU</div>
