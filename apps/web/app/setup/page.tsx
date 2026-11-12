@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import {
   Activity, ArrowLeft, CheckCircle2, CircleAlert, KeyRound,
-  LoaderCircle, LockKeyhole, ShieldCheck, Wifi,
+  LoaderCircle, LockKeyhole, ShieldCheck,
 } from "lucide-react";
 
 type SetupStatus = { configured: boolean };
@@ -121,7 +121,7 @@ export default function SetupPage() {
             <div className="setupMissing">
               <CircleAlert size={18}/>
               <div><b>Konfigurasi server belum lengkap</b><p>Tambahkan tiga variable berikut di Vercel → Project → Settings → Environment Variables, pilih Production dan Preview, lalu redeploy.</p>
-              <code>SUPABASE_URL</code><code>SUPABASE_SERVICE_ROLE_KEY</code><code>BOOTSTRAP_SETUP_TOKEN</code>
+              <code>NEXT_PUBLIC_SUPABASE_URL</code><code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code><code>SUPABASE_SERVICE_ROLE_KEY</code><code>BOOTSTRAP_SETUP_TOKEN</code>
               <small>Setup token harus berupa string acak minimal 32 karakter. Service-role key hanya disimpan di server, tidak di browser.</small>
               </div>
             </div>
