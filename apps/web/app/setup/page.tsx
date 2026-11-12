@@ -18,8 +18,10 @@ type SetupResponse = {
 export default function SetupPage() {
   const [status, setStatus] = useState<SetupStatus | null>(null);
   const [token, setToken] = useState("");
-  const [passwords, setPasswords] = useState({ inuu: "", inu: "", lab: "" });
-  const [confirmations, setConfirmations] = useState({ inuu: "", inu: "", lab: "" });
+  const ACCOUNT_IDS = ["inuu", "avi_lab", "riska_lab"] as const;
+  type AccountId = (typeof ACCOUNT_IDS)[number];
+  const [passwords, setPasswords] = useState<Record<AccountId, string>>({ inuu: "", avi_lab: "", riska_lab: "" });
+  const [confirmations, setConfirmations] = useState<Record<AccountId, string>>({ inuu: "", avi_lab: "", riska_lab: "" });
   const [visible, setVisible] = useState(false);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<SetupResponse | null>(null);
@@ -34,13 +36,13 @@ export default function SetupPage() {
     return () => { alive = false; };
   }, []);
 
-  function updatePassword(id: "inuu" | "inu" | "lab", value: string) {
+  function updatePassword(id: AccountId, value: string) {
     setPasswords((current) => ({ ...current, [id]: value }));
     setResult(null);
     setError("");
   }
 
-  function updateConfirmation(id: "inuu" | "inu" | "lab", value: string) {
+  function updateConfirmation(id: AccountId, value: string) {
     setConfirmations((current) => ({ ...current, [id]: value }));
     setResult(null);
     setError("");
@@ -51,7 +53,7 @@ export default function SetupPage() {
     setError("");
     setResult(null);
 
-    for (const id of ["inuu", "inu", "lab"] as const) {
+    for (const id of ACCOUNT_IDS) {
       if (passwords[id].length < 12) {
         setError("Semua password minimal 12 karakter.");
         return;
@@ -79,8 +81,8 @@ export default function SetupPage() {
       } else {
         setResult(data);
         setToken("");
-        setPasswords({ inuu: "", inu: "", lab: "" });
-        setConfirmations({ inuu: "", inu: "", lab: "" });
+        setPasswords({ inuu: "", avi_lab: "", riska_lab: "" });
+        setConfirmations({ inuu: "", avi_lab: "", riska_lab: "" });
       }
     } catch {
       setError("Tidak dapat menghubungi server setup. Coba periksa koneksi.");
@@ -111,7 +113,7 @@ export default function SetupPage() {
           <div className="setupIcon"><KeyRound size={22}/></div>
           <span className="eyebrow">ACCOUNT INITIALIZATION</span>
           <h2>Konfigurasi akun awal</h2>
-          <p className="setupLead">Sebelum mulai, jalankan migration Supabase 001, 002, dan 003 serta tambahkan environment variables di Vercel.</p>
+          <p className="setupLead">Sebelum mulai, jalankan migration Supabase 001–004 dan tambahkan environment variables di Vercel.</p>
 
           {status === null ? (
             <div className="setupStatus"><LoaderCircle size={17}/> Memeriksa konfigurasi server…</div>
@@ -134,8 +136,8 @@ export default function SetupPage() {
             <div className="setupFormDivider"><span>AKUN DAN ROLE</span></div>
             {([
               ["inuu", "Inuu", "Super Admin"],
-              ["inu", "Inu", "Super Admin"],
-              ["lab", "Laboratorium", "Lab User"],
+              ["avi_lab", "Avi_Lab", "Lab User"],
+              ["riska_lab", "Riska_lab", "Lab User"],
             ] as const).map(([id, name, role]) => (
               <div className="setupAccount" key={id}>
                 <div className="setupAccountHead"><span className="setupAvatar">{name.slice(0,1)}</span><span><b>{name}</b><small>ID: <strong>{id}</strong></small></span><em>{role}</em></div>
@@ -150,6 +152,7 @@ export default function SetupPage() {
             <label className="setupShow"><input type="checkbox" checked={visible} onChange={(event) => setVisible(event.target.checked)}/> Tampilkan password saat mengetik</label>
             {error && <div className="setupAlert"><CircleAlert size={17}/>{error}</div>}
             {result?.ok && <div className="setupSuccess"><CheckCircle2 size={18}/><div><b>Akun berhasil dibuat</b><p>{result.message}</p><Link href="/">Kembali ke halaman login →</Link></div></div>}
+            <div className="setupReminder">Simpan password di password manager sebelum menekan tombol. Password tidak dapat ditampilkan kembali setelah akun berhasil dibuat.</div>
             <button className="setupSubmit" type="submit" disabled={busy || !status?.configured}>
               {busy ? <><LoaderCircle size={17} className="spin"/> Menyiapkan akun…</> : <><LockKeyhole size={17}/> Buat 3 akun dan aktifkan login</>}
             </button>
