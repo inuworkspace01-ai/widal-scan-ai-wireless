@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
   if (!expectedToken || expectedToken.length < 32 || !supabaseUrl || !serviceRoleKey) {
     return json(
-      "Setup belum siap. Admin perlu mengisi SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, dan BOOTSTRAP_SETUP_TOKEN di Vercel Environment Variables.",
+      "Setup belum siap. Admin perlu mengisi NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, SUPABASE_SERVICE_ROLE_KEY, dan BOOTSTRAP_SETUP_TOKEN di Vercel Environment Variables.",
       503
     );
   }
