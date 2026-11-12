@@ -81,13 +81,14 @@ export async function POST(request: NextRequest) {
   }
 
   if (normalizedPasswords.some((value, index) =>
-    /^(.)\\1+$/.test(value) || value.toLowerCase() === ACCOUNT_IDS[index]
+    new Set(value).size === 1 || value.toLowerCase() === ACCOUNT_IDS[index]
   )) {
     return json("Gunakan password yang kuat dan tidak sama dengan ID akun.", 400);
   }
 
   try {
-    const edgeResponse = await fetch(supabaseUrl.replace(/\\/$/, "") + "/functions/v1/bootstrap-accounts", {
+    const projectUrl = supabaseUrl.endsWith("/") ? supabaseUrl.slice(0, -1) : supabaseUrl;
+    const edgeResponse = await fetch(projectUrl + "/functions/v1/bootstrap-accounts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
