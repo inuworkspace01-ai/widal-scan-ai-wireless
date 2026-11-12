@@ -38,15 +38,16 @@ The first dashboard accounts are provisioned as:
 
 No default passwords are committed. Run all four migrations `001_initial_schema.sql`, `002_username_accounts.sql`, `003_role_scoped_access.sql`, and `004_initial_accounts_and_single_admin.sql` in Supabase SQL Editor. The fourth migration retires the old starter IDs and ensures only Inuu retains the admin role.
 
-Configure Vercel Project → Settings → Environment Variables:
+Configure these three Vercel Project → Settings → Environment Variables for Production and Preview:
 - `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL.
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — Supabase publishable/anon key.
-- `SUPABASE_SECRET_KEY` — server-only Supabase secret key (`sb_secret_...`); never prefix with `NEXT_PUBLIC_`. The legacy `SUPABASE_SERVICE_ROLE_KEY` is also accepted temporarily.
-- `BOOTSTRAP_SETUP_TOKEN` — a random secret of at least 32 characters.
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — Supabase publishable key.
+- `BOOTSTRAP_SETUP_TOKEN` — the one-time setup token (at least 32 random characters).
 
-Redeploy, open `/setup`, enter the setup token, and create three different passwords (minimum 12 characters) for `Inuu`, `Avi_Lab`, and `Riska_lab`. The wizard creates the Supabase Auth accounts and matching profiles. It does not need Node.js or npm on the client PC. The initial setup endpoint refuses to run again after all three profile records exist.
+The privileged account-creation logic runs in the deployed Supabase Edge Function `bootstrap-accounts`, which reads the Supabase-managed `SUPABASE_SECRET_KEYS` / legacy service role key inside the function runtime. Do not copy a secret key to Vercel or the browser.
 
-After successful setup, remove `SUPABASE_SECRET_KEY` (or legacy `SUPABASE_SERVICE_ROLE_KEY`) and `BOOTSTRAP_SETUP_TOKEN` from Vercel and redeploy to close the setup endpoint. Keep only the two `NEXT_PUBLIC_*` browser variables for sign-in.
+Redeploy, open `/setup`, enter the one-time token, and create three different passwords (minimum 12 characters) for `Inuu`, `Avi_Lab`, and `Riska_lab`. The wizard creates Supabase Auth users and matching profiles. It does not need Node.js or npm on the client PC. The Edge Function validates a SHA-256 token verifier, and the database marks the token consumed after successful setup.
+
+After successful setup, remove `BOOTSTRAP_SETUP_TOKEN` from Vercel and redeploy to close the Vercel bootstrap proxy. The Supabase Edge Function will also reject requests once the three profiles exist and the database token has been consumed. Keep the two `NEXT_PUBLIC_*` variables for sign-in.
 
 ID login uses internal aliases in the reserved `.invalid` domain and Supabase Auth password verification. It does not send email.
 
