@@ -162,6 +162,11 @@ export async function POST(request: NextRequest) {
           // an existing account password.
           user = await findAuthUser(email);
           if (!user) throw error;
+          const { error: passwordError } = await supabase.auth.admin.updateUserById(
+            user.id,
+            { password: passwords[index] }
+          );
+          if (passwordError) throw passwordError;
         } else {
           user = data.user;
         }

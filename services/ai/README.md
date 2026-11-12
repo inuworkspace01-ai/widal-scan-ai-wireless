@@ -120,3 +120,67 @@ python train_clinical_baseline.py --csv data/typhoid.csv --target-column YOUR_LA
 Inspect the CSV schema and licence before running this. The runner excludes common direct identifiers by column-name pattern, but that is not a substitute for manual de-identification and leakage review. Do not feed its class predictions into the Widal image-grade workflow. Outputs are exploratory research only and do not diagnose a patient.
 
 See [DATA-SOURCES.md](DATA-SOURCES.md) for the source register, WHO/Kemenkes reference use, and the data-governance checklist.
+
+
+## Guarded automatic candidate retraining (Windows)
+
+The scheduled job is intended to keep a research candidate up to date when new **ATLM-approved visual labels** are added. It does not train from every captured image, does not invent labels, and does not promote a new model to a live workflow.
+
+1. Finish the manual data preparation steps above. Keep the specimen images and manifest in a protected local research folder. Do not put them in GitHub.
+2. Create an approval file beside the manifest by copying `data/dataset_approval.example.json` to `data/crops/dataset_approval.json`.
+3. Calculate the manifest hash in PowerShell:
+
+```powershell
+(Get-FileHash .\data\crops\dataset.csv -Algorithm SHA256).Hash.ToLower()
+```
+
+4. Put that exact hash in `manifest_sha256`, set `approved` to `true`, and record the authorized ATLM reviewer and timestamp in `approved_by` and `approved_at`. Any modification to the manifest invalidates the approval hash.
+5. From the repository root, register the weekly Windows Task Scheduler job:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\services\ai\windows\register-weekly-training.ps1 -ProjectRoot (Get-Location).Path
+```
+
+The default schedule is Sunday at 03:00 local PC time. The PC must be available for the scheduled task to run. The job checks for a changed, approved manifest and skips if the hash is unchanged.
+
+6. Candidate checkpoints and metrics are written under `services/ai/artifacts/auto/`. Each candidate is marked `awaiting_atlm_and_research_review`.
+
+To remove the schedule:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\services\ai\windows\remove-weekly-training-task.ps1
+```
+
+**Release gate:** automatic promotion is deliberately disabled. An ATLM/research reviewer must inspect the locked test metrics, confusion matrix, subgroup performance, and data provenance before a candidate can replace any approved model. The weekly job only trains the visual-grade classifier; it does not train on Kaggle tabular data or use WHO/Kemenkes PDFs as image labels.
+
+
+## Guarded automatic candidate retraining (Windows)
+
+The scheduled job trains a research candidate when new **ATLM-approved visual labels** are available. It does not train from every camera capture, invent labels, or promote a model to the live workflow.
+
+1. Finish the manual data preparation steps above. Keep source images and the dataset manifest in a protected local research folder, not GitHub.
+2. Copy `data/dataset_approval.example.json` to `data/crops/dataset_approval.json`.
+3. Calculate the manifest hash in PowerShell:
+
+```powershell
+(Get-FileHash .\data\crops\dataset.csv -Algorithm SHA256).Hash.ToLower()
+```
+
+4. Put that exact hash in `manifest_sha256`, set `approved` to `true`, and record the authorized ATLM reviewer and timestamp in `approved_by` and `approved_at`. Any manifest modification invalidates the approval hash.
+5. From the repository root, register the weekly Windows Task Scheduler job:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\services\ai\windows\register-weekly-training.ps1 -ProjectRoot (Get-Location).Path
+```
+
+The default schedule is Sunday at 03:00 local PC time. The PC must be available for the task to run. The runner skips if the approved manifest hash has not changed.
+
+6. Candidate checkpoints and metrics are written to `services/ai/artifacts/auto/`. Each candidate is marked `awaiting_atlm_and_research_review`.
+
+Remove the task with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\services\ai\windows\remove-weekly-training-task.ps1
+```
+
+**Release gate:** automatic production promotion is deliberately disabled. An ATLM/research reviewer must inspect the locked test metrics, confusion matrix, subgroup performance, and data provenance before a candidate can replace an approved model. This weekly job trains the visual-grade classifier only; it does not train on Kaggle tabular data or use WHO/Kemenkes PDFs as image labels.

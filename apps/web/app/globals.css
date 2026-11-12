@@ -127,3 +127,22 @@
 .spin{animation:setupSpin 1s linear infinite}@keyframes setupSpin{to{transform:rotate(360deg)}}
 @media(max-width:900px){.setupShell{grid-template-columns:1fr}.setupHero{position:relative;min-height:260px;height:auto;padding:25px 24px}.setupHeroContent{margin:35px 0 25px}.setupHeroContent h1{font-size:34px}.setupHeroContent p{font-size:11px}.setupHeroFoot{margin-top:5px}.setupMain{padding:23px 16px 30px}}
 @media(max-width:520px){.setupAccount{grid-template-columns:1fr}.setupAccountHead{grid-column:1}.setupHeroContent{margin:25px 0 18px}.setupTop{margin-bottom:15px}.setupCard{padding:20px 15px}.setupAccountHead em{font-size:7px}.setupMain{padding:16px 10px 25px}}
+
+
+/* Password generation controls and setup safety note */
+.generatePassword{border:1px solid #cce5e3;background:#f0f9f8;color:#087f86;border-radius:8px;padding:7px 9px;font:800 9px 'DM Sans';white-space:nowrap;cursor:pointer}
+.generatePassword:hover{background:#e1f4f1;border-color:#9bd6d1}
+.setupReminder{background:#f5f9fc;border:1px solid #e0eaf1;border-radius:9px;padding:11px 12px;color:#687d90;font-size:9px;line-height:1.6}
+.setupAccountHead{flex-wrap:wrap}
+@media(max-width:520px){.generatePassword{margin-left:auto}.setupAccountHead em{margin-left:auto}}
+
+
+/* Guarded automatic training status panel */
+.autoTrainPanel{border:1px solid #dcece9;background:linear-gradient(145deg,#fff 0%,#f8fcfb 100%)}
+.autoTrainGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+.autoTrainGrid>div{border:1px solid #e1ecea;background:#fff;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:7px}
+.autoTrainGrid b{font-size:10px;color:#2b4657}
+.autoTrainGrid small{font-size:9px;line-height:1.55;color:#8798a4}
+.autoTrainPanel .notice{margin:14px 0}
+@media(max-width:850px){.autoTrainGrid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.autoTrainGrid{grid-template-columns:1fr}}

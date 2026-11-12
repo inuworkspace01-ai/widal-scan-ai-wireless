@@ -1,6 +1,6 @@
 # Security notes
 
-- Never commit Wi-Fi passwords, Supabase service-role keys, patient identifiers, or secrets.
+- Never commit Wi-Fi passwords, Supabase secret/service-role keys, patient identifiers, or secrets.
 - Use anonymized sample codes during prototyping.
 - Keep image storage private and review RLS policies before real use.
 - Bridge currently binds to localhost by default. If LAN access is enabled, add authentication, strict CORS, TLS where feasible, and firewall restrictions.
@@ -9,9 +9,12 @@
 
 ## Account login and roles
 
-- User IDs `inuu` and `inu` are mapped to the internal `admin` role (displayed as Super Admin).
-- User ID `lab` is mapped to the `atlm` role (displayed as Lab User).
+- `inuu` (display name `Inuu`) is the sole initial `admin` / Super Admin.
+- `avi_lab` (display name `Avi_Lab`) and `riska_lab` (display name `Riska_lab`) are `atlm` / Lab User accounts.
+- Login input is normalized to lowercase; display names preserve the requested casing.
 - Passwords are provisioned through Supabase Auth by the local bootstrap script. There are no source-code default passwords.
-- The Supabase service-role key is used only by the one-time local bootstrap script. It must never use a `NEXT_PUBLIC_*` prefix or be shipped to the browser.
+- `SUPABASE_SECRET_KEY` (or legacy `SUPABASE_SERVICE_ROLE_KEY`) is used only by the server-side one-time account bootstrap. It must never use a `NEXT_PUBLIC_*` prefix or be shipped to the browser.
 - The app's role-aware navigation is a convenience layer; PostgreSQL Row Level Security is the enforcement boundary. Review all RLS policies before enabling production records.
 - Internal login aliases use the reserved `.invalid` domain and are not email delivery addresses.
+- The initial setup endpoint must be disabled by removing its server-side secret and one-time setup token after account bootstrap.
+- Scheduled ML jobs accept only an ATLM-approved manifest whose SHA-256 matches the dataset. Candidate checkpoints are not promoted automatically.

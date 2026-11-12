@@ -11,7 +11,7 @@ where lower(username) in ('inu', 'lab');
 update public.profiles
 set role = 'atlm'
 where role = 'admin'
-  and lower(username) <> 'inuu';
+  and coalesce(lower(username), '') <> 'inuu';
 
 update public.profiles
 set display_name = 'Inuu',

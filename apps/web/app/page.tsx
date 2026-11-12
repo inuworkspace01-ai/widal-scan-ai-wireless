@@ -339,6 +339,19 @@ export default function Home() {
               <div className="panel modelCard"><div className="largeIcon"><FlaskConical size={24}/></div><span className="eyebrow">TABULAR ML</span><h3>Clinical research baseline</h3><p>Random Forest baseline untuk eksplorasi dataset klinis setelah kolom, label, provenance, dan lisensinya diverifikasi.</p><div className="modelMeta"><span>Architecture</span><b>Random Forest + preprocessing</b></div><div className="modelMeta"><span>Dataset candidate</span><b>Kaggle Typhoid Dataset</b></div><div className="modelMeta"><span>Current status</span><b>Runner ready · data not imported</b></div><div className="notice">Keluaran hanya riset eksploratif; bukan prediksi diagnosis individual atau rekomendasi terapi.</div></div>
             </div>
             <div className="panel"><h3>Training workflow</h3><div className="workflow"><div><span>01</span><b>Collect & verify</b><small>Data provenance, licence, SOP</small></div><div><span>02</span><b>Annotate</b><small>ATLM reference labels</small></div><div><span>03</span><b>Train</b><small>Group-aware split</small></div><div><span>04</span><b>Evaluate</b><small>Macro-F1, recall, confusion matrix</small></div><div><span>05</span><b>Review</b><small>ATLM + independent validation</small></div></div></div>
+            <div className="panel autoTrainPanel">
+              <div className="sectionIntro"><div><span className="eyebrow">CONTROLLED CONTINUAL LEARNING</span><h3>Automatic candidate retraining</h3><p>Pelatihan lokal terjadwal setiap Minggu pukul 03.00, hanya saat manifest dataset berubah dan disetujui ATLM.</p></div><span className="statusTag research">READY TO CONFIGURE</span></div>
+              <div className="autoTrainGrid">
+                <div><b>01 · Approved dataset</b><small>Foto Widal berlabel ATLM dan hash manifest yang cocok</small></div>
+                <div><b>02 · Weekly check</b><small>Windows Task Scheduler memeriksa dataset baru</small></div>
+                <div><b>03 · Candidate model</b><small>ResNet-18 dilatih dan metrik disimpan lokal</small></div>
+                <div><b>04 · Human release gate</b><small>ATLM/research review sebelum model boleh diganti</small></div>
+              </div>
+              <div className="notice">Belum ada training otomatis yang berjalan di PC. Jadwalkan dari folder repository dengan script <code>services/ai/windows/register-weekly-training.ps1</code>. Dataset dan model tetap tersimpan lokal; job tidak mengunggah citra ke GitHub.</div>
+              <div className="infoRow"><span>Run frequency</span><b>Weekly · Sunday 03:00 (local PC)</b></div>
+              <div className="infoRow"><span>Input gate</span><b>ATLM approval + SHA-256 manifest</b></div>
+              <div className="infoRow"><span>Production auto-promotion</span><b>Disabled · manual review required</b></div>
+            </div>
           </div>}
 
           {tab === "datasets" && isAdmin && <div className="stack">
