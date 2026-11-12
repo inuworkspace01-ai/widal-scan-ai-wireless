@@ -48,6 +48,17 @@ export default function SetupPage() {
     setError("");
   }
 
+  function generatePassword(id: AccountId) {
+    const bytes = new Uint8Array(20);
+    window.crypto.getRandomValues(bytes);
+    const generated = Array.from(bytes, (value) => value.toString(16).padStart(2, "0")).join("");
+    setPasswords((current) => ({ ...current, [id]: generated }));
+    setConfirmations((current) => ({ ...current, [id]: generated }));
+    setVisible(true);
+    setResult(null);
+    setError("");
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -140,7 +151,7 @@ export default function SetupPage() {
               ["riska_lab", "Riska_lab", "Lab User"],
             ] as const).map(([id, name, role]) => (
               <div className="setupAccount" key={id}>
-                <div className="setupAccountHead"><span className="setupAvatar">{name.slice(0,1)}</span><span><b>{name}</b><small>ID: <strong>{id}</strong></small></span><em>{role}</em></div>
+                <div className="setupAccountHead"><span className="setupAvatar">{name.slice(0,1)}</span><span><b>{name}</b><small>ID login: <strong>{name}</strong></small></span><em>{role}</em><button type="button" className="generatePassword" onClick={() => generatePassword(id)}>Generate password</button></div>
                 <label className="setupLabel">Password baru
                   <input value={passwords[id]} onChange={(event) => updatePassword(id, event.target.value)} type={visible ? "text" : "password"} autoComplete="new-password" minLength={12} maxLength={128} placeholder="Minimal 12 karakter" required/>
                 </label>
@@ -152,7 +163,7 @@ export default function SetupPage() {
             <label className="setupShow"><input type="checkbox" checked={visible} onChange={(event) => setVisible(event.target.checked)}/> Tampilkan password saat mengetik</label>
             {error && <div className="setupAlert"><CircleAlert size={17}/>{error}</div>}
             {result?.ok && <div className="setupSuccess"><CheckCircle2 size={18}/><div><b>Akun berhasil dibuat</b><p>{result.message}</p><Link href="/">Kembali ke halaman login →</Link></div></div>}
-            <div className="setupReminder">Simpan password di password manager sebelum menekan tombol. Password tidak dapat ditampilkan kembali setelah akun berhasil dibuat.</div>
+            <div className="setupReminder">Gunakan tombol Generate password untuk membuat password acak yang kuat. Simpan ketiganya di password manager sebelum menekan tombol. Password tidak ditampilkan kembali setelah akun berhasil dibuat.</div>
             <button className="setupSubmit" type="submit" disabled={busy || !status?.configured}>
               {busy ? <><LoaderCircle size={17} className="spin"/> Menyiapkan akun…</> : <><LockKeyhole size={17}/> Buat 3 akun dan aktifkan login</>}
             </button>
