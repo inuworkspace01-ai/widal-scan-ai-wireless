@@ -36,7 +36,7 @@ The first dashboard accounts are provisioned as:
 - `avi_lab` — laboratory user (database role `atlm`, display name `Avi_Lab`)
 - `riska_lab` — laboratory user (database role `atlm`, display name `Riska_lab`)
 
-No default passwords are committed. Create a Supabase project and run migrations `001_initial_schema.sql`, `002_username_accounts.sql`, and `003_role_scoped_access.sql` in Supabase SQL Editor.
+No default passwords are committed. Run all four migrations `001_initial_schema.sql`, `002_username_accounts.sql`, `003_role_scoped_access.sql`, and `004_initial_accounts_and_single_admin.sql` in Supabase SQL Editor. The fourth migration retires the old starter IDs and ensures only Inuu retains the admin role.
 
 Configure Vercel Project → Settings → Environment Variables:
 - `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL.
@@ -56,4 +56,4 @@ ID login uses internal aliases in the reserved `.invalid` domain and Supabase Au
 - `services/ai/train_clinical_baseline.py`: exploratory tabular baseline after manually verifying a Kaggle CSV, its target column, source licence, provenance and label quality.
 - `services/ai/DATA-SOURCES.md`: source register for Kaggle, WHO and Kemenkes and their correct roles.
 
-WHO/Kemenkes publications are reference material, not labelled patient datasets. The Kaggle candidate is tabular and cannot train the image classifier. All AI outputs remain research-only and require professional review.
+WHO/Kemenkes publications are reference material, not labelled patient datasets. The Kaggle candidate is tabular and cannot train the image classifier. A guarded weekly local training job is available at `services/ai/auto_train.py`; it requires a dataset hash approved by an ATLM and produces a candidate only. It never replaces the active model automatically. All AI outputs remain research-only and require professional review.
