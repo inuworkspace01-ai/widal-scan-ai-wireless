@@ -25,7 +25,7 @@ uvicorn app.main:app --host 127.0.0.1 --port 8765
 Simulation mode is enabled by default and creates a synthetic placeholder, not a specimen.
 
 ## Supabase
-Run `supabase/migrations/001_initial_schema.sql` in Supabase SQL Editor. Review security policies before enabling real users. Do not store patient identifiers in this prototype.
+Run `supabase/migrations/001_initial_schema.sql` and `002_username_accounts.sql` in Supabase SQL Editor before initializing user accounts. Review security policies before enabling real users. Do not store patient identifiers in this prototype.
 
 **ALL SYSTEM PROVIDE BY INUU**
 
