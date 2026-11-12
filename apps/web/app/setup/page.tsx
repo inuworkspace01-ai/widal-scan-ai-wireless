@@ -111,7 +111,7 @@ export default function SetupPage() {
           <div className="setupIcon"><KeyRound size={22}/></div>
           <span className="eyebrow">ACCOUNT INITIALIZATION</span>
           <h2>Konfigurasi akun awal</h2>
-          <p className="setupLead">Sebelum mulai, jalankan migration Supabase 001 dan 002 serta tambahkan environment variables di Vercel.</p>
+          <p className="setupLead">Sebelum mulai, jalankan migration Supabase 001, 002, dan 003 serta tambahkan environment variables di Vercel.</p>
 
           {status === null ? (
             <div className="setupStatus"><LoaderCircle size={17}/> Memeriksa konfigurasi server…</div>
