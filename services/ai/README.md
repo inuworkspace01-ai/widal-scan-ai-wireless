@@ -51,9 +51,14 @@ cd services/ai
 py -3.11 -m venv .venv
 .\\.venv\\Scripts\\Activate.ps1
 python -m pip install --upgrade pip
-# Install torch and torchvision using the official selector:
-# https://pytorch.org/get-started/locally/
+# For CPU-only PCs, install the CPU wheels first:
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+# Then install the remaining project requirements:
 pip install -r requirements.txt
+
+# For NVIDIA CUDA, choose the matching command at:
+# https://pytorch.org/get-started/locally/
+# Avoid installing a CPU wheel after installing a CUDA build.
 \`\`\`
 
 ## Prepare cropped well images
@@ -184,3 +189,27 @@ powershell -ExecutionPolicy Bypass -File .\services\ai\windows\remove-weekly-tra
 ```
 
 **Release gate:** automatic production promotion is deliberately disabled. An ATLM/research reviewer must inspect the locked test metrics, confusion matrix, subgroup performance, and data provenance before a candidate can replace an approved model. This weekly job trains the visual-grade classifier only; it does not train on Kaggle tabular data or use WHO/Kemenkes PDFs as image labels.
+
+## External binary agglutination benchmark (not Widal)
+
+The following public research datasets may be used to explore image quality, morphology, calibration and binary clumping recognition. They are **not Widal O/H/AH/BH reaction-grade data** and must remain in the separate `external_agglutination_binary` task.
+
+### Blood Agglutination Curated Dataset V1
+
+- DOI: https://doi.org/10.5281/zenodo.21384197
+- Dataset Data Card: https://github.com/sayon-mitra024/blood-agglutination-calibration-framework/blob/main/DATA_CARD.md
+- Repository: https://github.com/sayon-mitra024/blood-agglutination-calibration-framework
+- Declared size: 8,043 images (6,550 train / 1,030 validation / 463 test), binary clumped/not-clumped, resized to 224×224 RGB
+- Declared licence: CC BY 4.0, as stated by the dataset Data Card. Retain attribution and verify the current Zenodo record / original Roboflow terms before reuse.
+- Provenance: curated from Roboflow Universe “Blood Group Detection”; the Data Card does not provide donor/specimen IDs. It declares fixed train/validation/test splits and no cross-split image leakage, but this does not establish patient-level independence.
+- Reported external paper/model: https://huggingface.co/sayon-mitra024/blood-agglutination-classifier. Its paper/model reports its own binary blood-agglutination experiment; those metrics are not WIDAL-SCAN results.
+- Use only as an external binary agglutination benchmark or exploratory transfer-learning source. Do not convert labels into 0, 1+, 2+, 3+, 4+ or treat it as Widal.
+
+### BloodyWell
+
+- DOI: https://zenodo.org/records/14285035
+- Repository: https://github.com/createcolor/bloody_well
+- 3,139 ABO/Rh/Kell blood-group well images; only a 529-image test subset is described as publicly available in the GitHub README.
+- Different reagent chemistry and target labels. Use as an external binary-agglutination test only, not for Widal grade training.
+
+Neither dataset is a substitute for the required locally captured Widal images annotated against the selected kit instructions and laboratory SOP. Do not use the benchmark metrics or pretrained external model as evidence of Widal performance.
