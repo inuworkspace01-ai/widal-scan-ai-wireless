@@ -24,11 +24,12 @@ The optional `train_clinical_baseline.py` script is a research-only baseline run
 
 - **BloodyWell:** https://zenodo.org/records/14285035
 - **Repository and public test subset:** https://github.com/createcolor/bloody_well
-- The Zenodo record describes 3,139 anonymised 512×512 well images from 92 plates and 550 blood samples mixed with 13 reagents for ABO, Rh and Kell blood-group systems. The dataset includes medical-record-derived blood group ground truth and six-expert certainty assessments for agglutination.
-- The public GitHub README says the full dataset is not available from the repository and exposes a 529-image test subset (228 MB) with binary `gt_result` (0/1), reagent type, plate row and reagent column.
-- **Use in this project:** external morphology/quality-control research only, or a separate binary agglutination benchmark. Do not convert its labels into Widal grades 0, 1+, 2+, 3+, 4+ and do not merge it with Widal training/validation/test partitions. It uses different biological targets and reagent chemistry.
-- **Rights/access:** verify the Zenodo record's current licence and any dataset-specific terms before download, redistribution or model training. The GitHub repository's software licence should not automatically be assumed to license every linked image file.
-- **Status:** candidate source recorded; not downloaded or trained in this project.
+- The study describes 3,139 anonymised 512×512 well images from 92 plates and 550 donor blood samples mixed with 13 reagents for ABO, Rh and Kell systems. Each image has a blood-group ground truth and confidence assessments from six serology experts.
+- The GitHub project states that the **full dataset is not publicly downloadable there** and exposes only a 529-image test subset (228 MB) with binary `gt_result` (0/1), reagent type, plate row and reagent column. The Zenodo record lists an `imgs.zip` file of 1.7 GB, but this conflicts with the paper/repository access statement; verify the current version and permission with the authors before acquiring any full data.
+- Expert confidence labels use `0, 0.25, 0.5, 0.75, 1.0`; they represent confidence in agglutination presence, not Widal reaction grades `0, 1+, 2+, 3+, 4+`.
+- **Use in this project:** a separate external binary-agglutination benchmark or morphology research only, after data permission is confirmed. Do not convert its labels into Widal grades or merge it into Widal training/validation/test partitions. It uses different biological targets and reagent chemistry.
+- **Rights/access:** the record's dataset-specific licence is not clearly specified in the accessible metadata. Verify permissions with the authors before downloading, training, redistribution or commercial use. The GitHub software licence does not automatically license linked images.
+- **Status:** catalogued in Supabase as `external_agglutination_binary`, pending rights/access review; not downloaded and not trained in this project.
 
 A separate one-image illustration is available on Wikimedia Commons: https://commons.wikimedia.org/wiki/File:Widal_Test_Slide.jpg. It is licensed CC BY-SA 3.0 and shows a Widal slide with O/H agglutination. This is a single illustrative image without machine-readable per-well grade annotations; use it for reference/demo only, not model training.
 
