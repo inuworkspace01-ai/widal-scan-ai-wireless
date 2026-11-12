@@ -39,6 +39,22 @@ const SOURCES = [
     note: "For exploratory clinical-feature research only; not image labels."
   },
   {
+    title: "Blood Agglutination Curated Dataset V1",
+    kind: "Image dataset · binary blood-group agglutination",
+    status: "External benchmark only",
+    description: "Dataset Data Card reports 8,043 RGB images (6,550 train / 1,030 validation / 463 test), clumped vs not-clumped, 224×224. Declared CC BY 4.0; curated from Roboflow Blood Group Detection. No specimen IDs are supplied, so patient-level split independence cannot be established.",
+    url: "https://doi.org/10.5281/zenodo.21384197",
+    note: "Separate binary research benchmark; not Widal grades. Keep original attribution and verify dataset/Roboflow terms."
+  },
+  {
+    title: "BloodyWell — Agglutination Image Dataset",
+    kind: "Image dataset · blood grouping (not Widal)",
+    status: "External benchmark only",
+    description: "Zenodo lists 3,139 anonymised 512×512 well images from 92 plates and 550 blood samples using ABO/Rh/Kell reagents. The public GitHub project states only its 529-image test subset is publicly downloadable. Labels are binary agglutination presence/absence and/or expert certainty, not Widal 0–4+ grades.",
+    url: "https://zenodo.org/records/14285035",
+    note: "Do not merge into Widal training labels. Confirm dataset licence and access terms before downloading or reuse."
+  },
+  {
     title: "WHO Laboratory Manual for Typhoid and Paratyphoid",
     kind: "Guideline reference · 2026",
     status: "Reference only",

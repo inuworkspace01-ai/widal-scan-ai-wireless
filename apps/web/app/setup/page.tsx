@@ -23,10 +23,6 @@ const REQUIRED_ENV = [
     description: "Supabase → Settings → API Keys → Publishable key.",
   },
   {
-    key: "SUPABASE_SECRET_KEY",
-    description: "Supabase → Settings → API Keys → Secret key. Jangan dibagikan.",
-  },
-  {
     key: "BOOTSTRAP_SETUP_TOKEN",
     description: "Token acak 64 karakter. Bisa dibuat langsung dari halaman ini.",
   },
@@ -184,7 +180,7 @@ export default function SetupPage() {
           <div className="setupIcon"><KeyRound size={22}/></div>
           <span className="eyebrow">ACCOUNT INITIALIZATION</span>
           <h2>Konfigurasi akun awal</h2>
-          <p className="setupLead">Sebelum mulai, jalankan migration Supabase 001–004 dan tambahkan environment variables di Vercel.</p>
+          <p className="setupLead">Database Supabase dan fungsi bootstrap sudah disiapkan. Pastikan tiga environment variable aplikasi tersedia di Vercel.</p>
 
           <section className="setupConfigPanel" aria-live="polite">
             <div className="setupConfigHeader">
@@ -255,7 +251,7 @@ export default function SetupPage() {
                     )}
                   </div>
                 )}
-                <p><strong>Catatan:</strong> menghubungkan Supabase sebagai integrasi tidak otomatis memasukkan key ke Environment Variables project Vercel. Pastikan keempat variable benar-benar ditambahkan pada project yang menjalankan website.</p>
+                <p><strong>Catatan:</strong> menghubungkan Supabase sebagai integrasi tidak otomatis memasukkan key ke Environment Variables project Vercel. Pastikan ketiga variable benar-benar ditambahkan pada project yang menjalankan website.</p>
               </div>
             )}
 
