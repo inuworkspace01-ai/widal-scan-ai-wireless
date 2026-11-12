@@ -39,6 +39,14 @@ const SOURCES = [
     note: "For exploratory clinical-feature research only; not image labels."
   },
   {
+    title: "Blood Agglutination Curated Dataset V1",
+    kind: "Image dataset · binary blood-group agglutination",
+    status: "External benchmark only",
+    description: "Dataset Data Card reports 8,043 RGB images (6,550 train / 1,030 validation / 463 test), clumped vs not-clumped, 224×224. Declared CC BY 4.0; curated from Roboflow Blood Group Detection. No specimen IDs are supplied, so patient-level split independence cannot be established.",
+    url: "https://doi.org/10.5281/zenodo.21384197",
+    note: "Separate binary research benchmark; not Widal grades. Keep original attribution and verify dataset/Roboflow terms."
+  },
+  {
     title: "BloodyWell — Agglutination Image Dataset",
     kind: "Image dataset · blood grouping (not Widal)",
     status: "External benchmark only",
