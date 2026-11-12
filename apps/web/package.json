@@ -1,8 +1,14 @@
 {
   "name": "widal-scan-web",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "scripts": { "dev": "next dev", "build": "next build", "start": "next start", "lint": "tsc --noEmit" },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "tsc --noEmit",
+    "seed:accounts": "node --env-file=.env.accounts scripts/seed-accounts.mjs"
+  },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.1",
