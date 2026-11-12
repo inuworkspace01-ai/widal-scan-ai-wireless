@@ -36,17 +36,17 @@ The first dashboard accounts are provisioned as:
 - `inu` — super admin (database role `admin`)
 - `lab` — laboratory user (database role `atlm`)
 
-No default passwords are committed. Create a Supabase project, run migrations `001_initial_schema.sql` and `002_username_accounts.sql`, then copy `apps/web/.env.accounts.example` to `apps/web/.env.accounts`. Put a different, strong password (12+ characters) in each environment variable and run from `apps/web`:
+No default passwords are committed. Create a Supabase project and run migrations `001_initial_schema.sql` and `002_username_accounts.sql` in Supabase SQL Editor.
 
-```powershell
-npm run seed:accounts
-```
+Configure Vercel Project → Settings → Environment Variables:
+- `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL.
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — Supabase publishable/anon key.
+- `SUPABASE_SERVICE_ROLE_KEY` — server-only service role secret; never prefix with `NEXT_PUBLIC_`.
+- `BOOTSTRAP_SETUP_TOKEN` — a random secret of at least 32 characters.
 
-Set these Vercel environment variables for the web app:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (or legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
+Redeploy, open `/setup`, enter the setup token, and create three different passwords (minimum 12 characters) for `inuu`, `inu`, and `lab`. The wizard creates the Supabase Auth accounts and matching profiles. It does not need Node.js or npm on the client PC. The initial setup endpoint refuses to run again after all three profile records exist.
 
-**Never put `SUPABASE_SERVICE_ROLE_KEY` in a `NEXT_PUBLIC_*` variable or the Vercel client environment.** The service-role key is only for the one-time local account bootstrap script.
+After successful setup, remove `SUPABASE_SERVICE_ROLE_KEY` and `BOOTSTRAP_SETUP_TOKEN` from Vercel and redeploy to close the setup endpoint. Keep only the two `NEXT_PUBLIC_*` browser variables for sign-in.
 
 ID login uses internal aliases in the reserved `.invalid` domain and Supabase Auth password verification. It does not send email.
 
