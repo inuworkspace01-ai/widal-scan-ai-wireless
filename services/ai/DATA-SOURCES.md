@@ -20,6 +20,18 @@ No public Kaggle clinical dataset can substitute for these real, method-specific
 
 The optional `train_clinical_baseline.py` script is a research-only baseline runner. It requires the user to inspect the CSV, explicitly choose the target column, and exclude identifiers/leakage features. It does not return a patient diagnosis or treatment recommendation.
 
+## 3. Blood Agglutination Curated Dataset V1 (not Widal)
+
+- **DOI:** https://doi.org/10.5281/zenodo.21384197
+- **Dataset Data Card:** https://github.com/sayon-mitra024/blood-agglutination-calibration-framework/blob/main/DATA_CARD.md
+- **Repository:** https://github.com/sayon-mitra024/blood-agglutination-calibration-framework
+- **Declared composition:** 8,043 RGB images resized to 224×224 (6,550 train / 1,030 validation / 463 test); binary clumped / not-clumped labels. The dataset Data Card reports 7,009 clumped and 1,034 not-clumped images, an imbalanced distribution.
+- **Provenance:** curated from Roboflow Universe “Blood Group Detection”. Its Data Card declares deduplication and fixed splits, but no donor/specimen identifier is supplied. A claimed image-level leakage audit does not prove patient-level group separation.
+- **License:** CC BY 4.0 as declared by the dataset Data Card. Preserve attribution and verify the current Zenodo metadata and original Roboflow licence before reuse.
+- **Related third-party model:** https://huggingface.co/sayon-mitra024/blood-agglutination-classifier. Its model card reports macro-F1 0.741 and balanced accuracy 0.766 on its own 463-image test set. These are the third party’s reported binary benchmark results, not independent verification and not WIDAL-SCAN performance.
+- **Use:** external binary agglutination benchmark / exploratory transfer-learning only. Keep the classes `clumped` / `not clumped` separate from Widal reaction grades. Never map the two labels to `0`, `1+`, `2+`, `3+`, or `4+`.
+- **Status:** registered in Supabase as `external_agglutination_binary`, pending provenance/rights review; images have not been downloaded and no model has been trained by WIDAL-SCAN.
+
 ## 3. Related agglutination image dataset (not Widal)
 
 - **BloodyWell:** https://zenodo.org/records/14285035
